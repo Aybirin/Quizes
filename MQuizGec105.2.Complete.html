@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEC 105: Types of Communication - Quiz App</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --correct-bg: rgba(46, 160, 67, 0.15);
+            --correct-border: #2ea043;
+            --correct-text: #3fb950;
+            --wrong-bg: rgba(248, 81, 73, 0.15);
+            --wrong-border: #f85149;
+            --wrong-text: #ff7b72;
+            --analysis-bg: #1c2128;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 25px;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-box {
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .score-box {
+            color: var(--correct-text);
+        }
+
+        .answered-box {
+            color: #58a6ff;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #30363d;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: var(--option-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .option:not(.disabled):hover {
+            background-color: var(--option-hover);
+        }
+
+        .option.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--text-main);
+        }
+
+        .option.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--text-main);
+        }
+
+        .option.disabled {
+            cursor: default;
+        }
+
+        .status-tag {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .status-tag.correct-tag { color: var(--correct-text); }
+        .status-tag.wrong-tag { color: var(--wrong-text); }
+
+        .analysis-box {
+            margin-top: 15px;
+            background-color: var(--analysis-bg);
+            border-radius: 8px;
+            padding: 14px;
+            border-left: 3px solid #58a6ff;
+            display: none;
+        }
+
+        .analysis-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #58a6ff;
+            margin-bottom: 6px;
+        }
+
+        .analysis-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">GEC 105: Types of Communication</h1>
+        <div class="stats-bar">
+            <div class="stat-box score-box">Score: <span id="score-counter">0</span> / <span class="total-count">43</span></div>
+            <div class="stat-box answered-box">Answered: <span id="answered-counter">0</span> / <span class="total-count">43</span></div>
+        </div>
+    </div>
+
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: "According to the lesson, what are the three main classifications of communication?",
+            options: ["Mode, Context, and Purpose & Style", "Source, Message, and Channel", "Oral, Written, and Digital", "Formal, Informal, and Technical"],
+            correctIndex: 0,
+            analysis: "Communication is classified according to Mode, Context, and Purpose and Style."
+        },
+        {
+            question: "What dimension of communication is described as the 'way of delivery'?",
+            options: ["According to Context", "According to Mode", "According to Purpose and Style", "According to Structure"],
+            correctIndex: 1,
+            analysis: "Communication according to Mode represents the 'way of delivery'."
+        },
+        {
+            question: "Which classification of communication accounts for the 'background situation'?",
+            options: ["According to Mode", "According to Purpose and Style", "According to Context", "According to Channel"],
+            correctIndex: 2,
+            analysis: "Communication according to Context refers specifically to the background situation of the communication setting."
+        },
+        {
+            question: "Communication categorized by 'reason and tone' belongs to which type?",
+            options: ["According to Purpose and Style", "According to Context", "According to Mode", "According to Medium"],
+            correctIndex: 0,
+            analysis: "Communication according to Purpose and Style deals with the reason for communicating and the tone used."
+        },
+        {
+            question: "Which two main categories fall under communication according to Mode?",
+            options: ["Intrapersonal and Interpersonal", "Verbal and Non-verbal", "Downward and Upward", "Formal and Informal"],
+            correctIndex: 1,
+            analysis: "According to Mode, communication is broadly divided into Verbal and Non-verbal."
+        },
+        {
+            question: "In verbal communication, how are ideas expressed?",
+            options: ["Strictly through body movements", "Verbalized in the form of words and organized into a message", "Only through written symbols and diagrams", "Exclusively through tone of voice"],
+            correctIndex: 1,
+            analysis: "Verbal communication involves verbalizing ideas into words that are structured into a coherent message."
+        },
+        {
+            question: "What characterization is given to words used in effective verbal communication?",
+            options: ["Words that are complex, detailed, and poetic", "Words that carry meaning: clear, concise, and concrete details", "Words that rely entirely on emotional intonation", "Words that are ambiguous and open-ended"],
+            correctIndex: 1,
+            analysis: "Verbal communication relies on words carrying clear, concise, and concrete details to convey exact meaning."
+        },
+        {
+            question: "Which of the following lists the primary elements of verbal communication?",
+            options: ["Gestures, postures, and eye gaze", "Proxemics, chronemics, and haptics", "Grammar, organization, and vocabulary", "Downwards, upwards, and horizontal"],
+            correctIndex: 2,
+            analysis: "The explicitly named elements of verbal communication are grammar, organization, and vocabulary."
+        },
+        {
+            question: "How is non-verbal communication defined?",
+            options: ["Conveying information using formal spoken words", "Conveying information about emotions, needs, intentions, attitudes, and thoughts without using language", "Communicating using only written letters and emails", "Talking to oneself in internal monologue"],
+            correctIndex: 1,
+            analysis: "Non-verbal communication refers to sending messages regarding emotions, needs, intentions, attitudes, and thoughts without relying on spoken or written language."
+        },
+        {
+            question: "Which group consists of elements of non-verbal communication?",
+            options: ["Grammar, organization, and vocabulary", "Lectures, proposals, and business letters", "Gestures, behaviors, postures, facial expressions, appearance, or eye gaze", "Teleconferencing, Skype calls, and audio calls"],
+            correctIndex: 2,
+            analysis: "Non-verbal communication relies on physical elements like gestures, behaviors, posture, facial expressions, general appearance, and eye gaze."
+        },
+        {
+            question: "Which kind of non-verbal communication involves the study of personal space and distance?",
+            options: ["Chronemics", "Proxemics", "Kinesics", "Haptics"],
+            correctIndex: 1,
+            analysis: "Proxemics is identified as one of the specific kinds of non-verbal communication (focusing on space and physical distance)."
+        },
+        {
+            question: "Which non-verbal communication concept relates to the study and use of time?",
+            options: ["Chronemics", "Oculesics", "Haptics", "Kinesics"],
+            correctIndex: 0,
+            analysis: "Chronemics is listed as a kind of non-verbal communication, dealing with time perception and usage."
+        },
+        {
+            question: "Body movement, facial expressions, and body gestures are studied under which kind of non-verbal communication?",
+            options: ["Haptics", "Proxemics", "Kinesics", "Chronemics"],
+            correctIndex: 2,
+            analysis: "Kinesics is a recognized category of non-verbal communication involving body movements and gestures."
+        },
+        {
+            question: "Which type of non-verbal communication refers to communication through touch?",
+            options: ["Oculesics", "Haptics", "Kinesics", "Proxemics"],
+            correctIndex: 1,
+            analysis: "Haptics is listed as a kind of non-verbal communication relating to tactile interaction/touch."
+        },
+        {
+            question: "What kind of non-verbal communication focuses on eye movements, eye contact, and gaze?",
+            options: ["Oculesics", "Chronemics", "Proxemics", "Haptics"],
+            correctIndex: 0,
+            analysis: "Oculesics is the specific non-verbal category dealing with eye gaze and eye contact behavior."
+        },
+        {
+            question: "What is the defining feature of visual communication?",
+            options: ["Relying exclusively on acoustic sound waves", "Using visuals to convey information or messages", "Communicating through formal organizational structures", "Communicating using only internal thoughts"],
+            correctIndex: 1,
+            analysis: "Visual communication is explicitly defined as a type of communication that uses visual elements to convey information or messages."
+        },
+        {
+            question: "Which of the following is an example of visual communication?",
+            options: ["Face-to-face casual conversation", "Signs, maps, graphs, charts, and pictograms", "Internal self-talk and reflection", "Subordinate feedback reports"],
+            correctIndex: 1,
+            analysis: "Examples of visual communication include signs, symbols, imagery, maps, graphs, charts, diagrams, pictograms, photos, drawings, and electronic visuals."
+        },
+        {
+            question: "Which set of types represents communication classified according to Context?",
+            options: ["Verbal, Non-verbal, and Visual", "Intrapersonal, Interpersonal, Extended, Intercultural, and Organizational", "Downward, Upward, Horizontal, and Crosswise", "Formal and Informal"],
+            correctIndex: 1,
+            analysis: "Communication according to Context includes Intrapersonal, Interpersonal, Extended, Intercultural, and Organizational communication."
+        },
+        {
+            question: "What does the Latin prefix 'intra-' mean?",
+            options: ["Between or among", "Across or diagonal", "Within or inside", "Above or superior"],
+            correctIndex: 2,
+            analysis: "The Latin prefix intra- translates directly to 'within' or 'inside'."
+        },
+        {
+            question: "What is intrapersonal communication?",
+            options: ["Talking between two or more friends", "Communication of a person with himself/herself", "Communication between people of different cultures", "Communication flowing from subordinates to superiors"],
+            correctIndex: 1,
+            analysis: "Intrapersonal communication means talking to oneself or communicating with oneself."
+        },
+        {
+            question: "What characterizes interpersonal communication?",
+            options: ["It is communication strictly using electronic media", "It is simple interaction (greetings, getting to know someone) between or among people", "It occurs exclusively within corporate boardrooms", "It consists of silent self-reflection"],
+            correctIndex: 1,
+            analysis: "Interpersonal communication involves simple interactions like greetings or ordinary conversations occurring between or among people."
+        },
+        {
+            question: "What is the primary goal of an interpersonal communication situation?",
+            options: ["To establish or deepen one's relationship with others", "To send top-down commands in a business", "To deliver a formal public lecture", "To overcome cross-cultural barriers"],
+            correctIndex: 0,
+            analysis: "A communication situation is interpersonal if its intent is to establish or deepen relationships with other individuals."
+        },
+        {
+            question: "What key component defines extended communication?",
+            options: ["It excludes any technological intervention", "It involves the use of media to transmit messages quickly", "It only occurs in face-to-face informal chats", "It occurs only within a single person's mind"],
+            correctIndex: 1,
+            analysis: "Extended communication involves media usage, enabling quick message transmission over distance."
+        },
+        {
+            question: "Why are messages in extended communication transmitted quickly?",
+            options: ["Because of the strict formal language rules", "Because of the use of electronic media", "Because of non-verbal gestures", "Because of linear downward command structures"],
+            correctIndex: 1,
+            analysis: "Electronic media allows extended communication messages to travel rapidly across distances."
+        },
+        {
+            question: "Which of the following is an example of extended communication?",
+            options: ["A poster on a public bulletin board", "Teleconferencing, video-conferencing, and Skype calls", "Internal monologue during meditation", "A written business memo passed down to a secretary"],
+            correctIndex: 1,
+            analysis: "Tele-, audio-, or phone-conferencing, video-conferencing, and Skype calls are given as primary examples of extended communication."
+        },
+        {
+            question: "What is intercultural communication?",
+            options: ["Communication within a single family unit", "Communication between or among people having different linguistic, religious, ethnic, social, and professional backgrounds", "Communication between employees working in the same department", "Communication using non-verbal facial expressions"],
+            correctIndex: 1,
+            analysis: "Intercultural communication takes place between people belonging to different linguistic, ethnic, religious, social, or professional backgrounds."
+        },
+        {
+            question: "What is the main focus of organizational communication?",
+            options: ["Understanding how human body language operates", "The role that communication plays in organizational contexts", "How friends interact during social gatherings", "How messages travel across different historical eras"],
+            correctIndex: 1,
+            analysis: "Organizational communication centers on the function and role communication serves within company/organizational settings."
+        },
+        {
+            question: "According to the course slides, who comprises an organization?",
+            options: ["Individuals who work for the company", "External buyers and sellers only", "Government regulators", "Media representatives"],
+            correctIndex: 0,
+            analysis: "Organizations are composed of individuals working together for the company."
+        },
+        {
+            question: "What defines a Formal Communication Structure in an organization?",
+            options: ["Communication flowing purely through casual grapevine rumor", "Communication taking place via designated channels of message flow between positions", "Unplanned conversations during lunch breaks", "Communication restricted to social media chats"],
+            correctIndex: 1,
+            analysis: "Formal communication structures utilize designated, official channels for message flow between positions."
+        },
+        {
+            question: "Which four approaches are used in formal organizational communication?",
+            options: ["Verbal, Non-verbal, Visual, and Written", "Downward, Upward, Horizontal, and Crosswise", "Intrapersonal, Interpersonal, Extended, and Intercultural", "Chronemics, Proxemics, Kinesics, and Haptics"],
+            correctIndex: 1,
+            analysis: "The formal communication structure utilizes four primary directions: Downward, Upward, Horizontal, and Crosswise."
+        },
+        {
+            question: "How does downward communication operate in an organization?",
+            options: ["Flows from subordinates to superiors", "Flows from upper to lower positions (superior to subordinate) to assign tasks", "Flows strictly between peers in the same department", "Flows across unrelated external companies"],
+            correctIndex: 1,
+            analysis: "Downward communication flows top-down from superiors to subordinates, usually instructing them to complete tasks."
+        },
+        {
+            question: "What is the direction and purpose of upward communication?",
+            options: ["Top-down flow directing lower-level work", "Bottom-up transmission where subordinates send views/feedback on policies or job issues to superiors", "Lateral flow between department heads", "Diagonal flow across different organizational tiers"],
+            correctIndex: 1,
+            analysis: "Upward communication flows bottom-up, allowing staff to share feedback, views, or job concerns with bosses."
+        },
+        {
+            question: "What is horizontal communication?",
+            options: ["Communication between a boss and a direct subordinate", "Lateral communication among people on the same level coming from different departments to coordinate tasks", "Communication using unofficial grapevine channels", "Communication between low-level staff and top executives directly"],
+            correctIndex: 1,
+            analysis: "Horizontal communication is lateral, occurring between individuals at equal levels across different units for coordination."
+        },
+        {
+            question: "What characterizes crosswise (diagonal) communication?",
+            options: ["Communication that occurs strictly within a single department", "Employees from different departments/units working at various levels communicating with each other", "Communication strictly following the official chain of command top-down", "Communication limited to written legal contracts"],
+            correctIndex: 1,
+            analysis: "Crosswise communication is diagonal, linking employees across different functional areas and across different hierarchical levels."
+        },
+        {
+            question: "When does diagonal communication occur between staff members?",
+            options: ["When people at the same level interact with those at higher or lower levels of the hierarchy", "When superiors issue orders to direct subordinates only", "When coworkers in the exact same role discuss daily tasks", "When employees chat casually off company grounds"],
+            correctIndex: 0,
+            analysis: "Diagonal/crosswise communication occurs when staff interact across different levels (higher or lower) outside simple vertical chains."
+        },
+        {
+            question: "Where does an informal communication structure originate in an organization?",
+            options: ["From official company policy manuals", "From unofficial channels of message flow", "From human resources announcements", "From executive board meetings"],
+            correctIndex: 1,
+            analysis: "Informal structures arise from unofficial channels of interaction within an organization."
+        },
+        {
+            question: "What is another common term for informal organizational messages?",
+            options: ["Crosswise messages", "Grapevine messages", "Downward messages", "Linear messages"],
+            correctIndex: 1,
+            analysis: "Informal communication inside organizations is widely referred to as 'grapevine' messages."
+        },
+        {
+            question: "What language style is required in formal communication according to Purpose and Style?",
+            options: ["Casual slang and regional dialects", "Formal language delivered orally or in written form", "Abbreviated text messaging jargon", "Silent non-verbal signs only"],
+            correctIndex: 1,
+            analysis: "Formal communication uses formal language delivered via oral or written channels."
+        },
+        {
+            question: "Which of the following is an example of formal communication according to Purpose and Style?",
+            options: ["Texting a friend about weekend plans", "Lectures, public speeches, research/project proposals, reports, and business letters", "Chatting at a family dinner", "Phone calls with acquaintances"],
+            correctIndex: 1,
+            analysis: "Lectures, speeches, research proposals, business reports, and formal letters are classified under formal communication."
+        },
+        {
+            question: "What language characteristic defines informal communication?",
+            options: ["Strict adherence to academic grammar rules", "It does not employ formal language", "It requires formatted written reports", "It is restricted to legal terminology"],
+            correctIndex: 1,
+            analysis: "Informal communication does not require or employ formal language."
+        },
+        {
+            question: "With whom does informal communication typically take place?",
+            options: ["Corporate board directors during meetings", "Friends, family members, or acquaintances", "Government agencies during audits", "Academic thesis committees"],
+            correctIndex: 1,
+            analysis: "Informal communication involves everyday conversations with friends, family, or personal acquaintances."
+        },
+        {
+            question: "What modes can informal communication take according to Purpose and Style?",
+            options: ["Oral (face-to-face, everyday talks) or written (emails, personal notes, texts)", "Strictly written official memos", "Exclusively body gestures and facial expressions", "Public speeches and research defenses"],
+            correctIndex: 0,
+            analysis: "Informal communication mode can be oral (everyday chats, phone calls) or written (text messages, personal notes, informal emails)."
+        },
+        {
+            question: "What is the central purpose of informal communication?",
+            options: ["To delegate workplace duties and enforce policy", "Simply to socialize and enhance relationships", "To present scientific research findings", "To negotiate legal settlements"],
+            correctIndex: 1,
+            analysis: "The stated primary purpose of informal communication is to socialize and build/enhance interpersonal relationships."
+        }
+    ];
+
+    const TOTAL_QUESTIONS = quizData.length; 
+    let currentScore = 0;
+    let answeredCount = 0;
+
+    function shuffleArray(array) {
+        let shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function initQuiz() {
+        document.querySelectorAll('.total-count').forEach(el => el.textContent = TOTAL_QUESTIONS);
+        const quizContainer = document.getElementById('quiz-container');
+
+        const randomizedQuestions = shuffleArray(quizData);
+
+        randomizedQuestions.forEach((qData, qIndex) => {
+            let formattedChoices = qData.options.map((optText, origIndex) => ({
+                text: optText,
+                isCorrect: origIndex === qData.correctIndex
+            }));
+
+            formattedChoices = shuffleArray(formattedChoices);
+
+            const qCard = document.createElement('div');
+            qCard.className = 'question-card';
+            qCard.id = `q-${qIndex}`;
+
+            const labels = ['A', 'B', 'C', 'D'];
+            let optionsHTML = '';
+
+            formattedChoices.forEach((choice, cIndex) => {
+                optionsHTML += `
+                    <div class="option" data-correct="${choice.isCorrect}" onclick="checkAnswer('q-${qIndex}', this)">
+                        ${labels[cIndex]}. ${choice.text}
+                    </div>
+                `;
+            });
+
+            qCard.innerHTML = `
+                <div class="question-text">${qIndex + 1}. ${qData.question}</div>
+                <div class="options-list">${optionsHTML}</div>
+                <div class="analysis-box">
+                    <div class="analysis-title">AI Analysis</div>
+                    <p class="analysis-text">${qData.analysis}</p>
+                </div>
+            `;
+
+            quizContainer.appendChild(qCard);
+        });
+    }
+
+    function checkAnswer(questionCardId, selectedOption) {
+        const card = document.getElementById(questionCardId);
+        if (card.getAttribute('data-answered') === 'true') return;
+        card.setAttribute('data-answered', 'true');
+
+        const options = card.querySelectorAll('.option');
+        const analysisBox = card.querySelector('.analysis-box');
+        const isSelectedCorrect = selectedOption.getAttribute('data-correct') === 'true';
+
+        options.forEach((opt) => {
+            opt.classList.add('disabled');
+            const isOptCorrect = opt.getAttribute('data-correct') === 'true';
+
+            if (opt === selectedOption) {
+                if (isSelectedCorrect) {
+                    opt.classList.add('correct');
+                    opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer (Your answer)</span>`;
+                    currentScore++;
+                } else {
+                    opt.classList.add('wrong');
+                    opt.innerHTML += ` <span class="status-tag wrong-tag">✕ Your answer</span>`;
+                }
+            } else if (isOptCorrect) {
+                opt.classList.add('correct');
+                opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+            }
+        });
+
+        if (analysisBox) {
+            analysisBox.style.display = 'block';
+        }
+
+        answeredCount++;
+        document.getElementById('score-counter').textContent = currentScore;
+        document.getElementById('answered-counter').textContent = answeredCount;
+    }
+
+    window.onload = initQuiz;
+</script>
+
+</body>
+</html>
