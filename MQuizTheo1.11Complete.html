@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theology 103: Church History - Quiz App</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --correct-bg: rgba(46, 160, 67, 0.15);
+            --correct-border: #2ea043;
+            --correct-text: #3fb950;
+            --wrong-bg: rgba(248, 81, 73, 0.15);
+            --wrong-border: #f85149;
+            --wrong-text: #ff7b72;
+            --analysis-bg: #1c2128;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Permanently Sticky Top Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 25px;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-box {
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .score-box {
+            color: var(--correct-text);
+        }
+
+        .answered-box {
+            color: #58a6ff;
+        }
+
+        /* Question Cards */
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #30363d;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: var(--option-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .option:not(.disabled):hover {
+            background-color: var(--option-hover);
+        }
+
+        /* Option States */
+        .option.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--text-main);
+        }
+
+        .option.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--text-main);
+        }
+
+        .option.disabled {
+            cursor: default;
+        }
+
+        .status-tag {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .status-tag.correct-tag { color: var(--correct-text); }
+        .status-tag.wrong-tag { color: var(--wrong-text); }
+
+        /* AI Analysis Box */
+        .analysis-box {
+            margin-top: 15px;
+            background-color: var(--analysis-bg);
+            border-radius: 8px;
+            padding: 14px;
+            border-left: 3px solid #58a6ff;
+            display: none;
+        }
+
+        .analysis-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #58a6ff;
+            margin-bottom: 6px;
+        }
+
+        .analysis-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">Theology 103: Introduction to Church History</h1>
+        <div class="stats-bar">
+            <div class="stat-box score-box">Score: <span id="score-counter">0</span> / <span class="total-count">118</span></div>
+            <div class="stat-box answered-box">Answered: <span id="answered-counter">0</span> / <span class="total-count">118</span></div>
+        </div>
+    </div>
+
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: "Who defined the Church by stating, 'The Church is not a hotel for saints, it is a hospital for sinners'?",
+            options: ["St. Thérèse of Lisieux", "St. Augustine", "St. Paul", "St. Peter"],
+            correctIndex: 1,
+            analysis: "St. Augustine famously described the Church as a 'hospital for sinners' to highlight its role as a place of healing and grace rather than an exclusive assembly for the perfect."
+        },
+        {
+            question: "According to Lumen Gentium (no. 1), the Church, in Christ, is a sacrament—a sign and instrument of what two realities?",
+            options: ["Social welfare and economic justice", "Political power and temporal victory", "Communion with God and unity among all people", "Scriptural interpretation and academic research"],
+            correctIndex: 2,
+            analysis: "Lumen Gentium (Vatican II, no. 1) explicitly teaches that the Church is a sacrament or sign and instrument of intimate union with God and of the unity of all mankind."
+        },
+        {
+            question: "Catechism of the Catholic Church 771 states that the Church is at the same time a visible society and what else?",
+            options: ["A political institution", "A spiritual community", "A secular academy", "A temporary alliance"],
+            correctIndex: 1,
+            analysis: "CCC 771 defines the Church dual-natured reality: it is both a visible, structured society on Earth and a spiritual community mystical in nature."
+        },
+        {
+            question: "According to CCC 771, the Church is simultaneously a Mystical Body of Christ and what type of society?",
+            options: ["Democratic society", "Egalitarian society", "Hierarchical society", "Monastic society"],
+            correctIndex: 2,
+            analysis: "CCC 771 states the Church is simultaneously a hierarchical society (governed through apostolic succession) and the spiritual Mystical Body of Christ."
+        },
+        {
+            question: "Which saint stated, 'In the heart of the Church, my mother, I will be love'?",
+            options: ["St. Augustine", "St. Thérèse of Lisieux", "St. Teresa of Avila", "St. Catherine of Siena"],
+            correctIndex: 1,
+            analysis: "St. Thérèse of Lisieux expressed her vocation within the Church in her autobiography, identifying love as her ultimate calling at the heart of the Church."
+        },
+        {
+            question: "In Scripture, how is the Church presented regarding its foundation, structure, and animation?",
+            options: ["Founded by emperors, structured on Roman law, animated by philosophy", "Founded by Christ, structured on apostolic witness, animated by the Holy Spirit", "Founded by the Apostles, structured on local customs, animated by tradition", "Founded by early councils, structured on monarchies, animated by liturgy"],
+            correctIndex: 1,
+            analysis: "Scripture teaches that Christ himself founded the Church, structured it through the testimony and authority of the apostles, and gave it life through the Holy Spirit."
+        },
+        {
+            question: "Scripture shows that the Church exists as both a visible community and what other reality?",
+            options: ["A political power", "A spiritual reality", "A temporal state", "A historical artifact"],
+            correctIndex: 1,
+            analysis: "The biblical view holds that the Church extends beyond visible assemblies and earthly structures to embody a deep, supernatural spiritual reality."
+        },
+        {
+            question: "The English word 'church' originates from which Greek word meaning 'assembly' or 'gathering'?",
+            options: ["Koinonia", "Ekklesia", "Diakonia", "Leitourgia"],
+            correctIndex: 1,
+            analysis: "The word originates from the Greek 'ekklesia' (from ek-kaleo, to call out), designating an assembly or gathering called together by God."
+        },
+        {
+            question: "In Scripture, what is the primary definition of the Church beyond just a place or organization?",
+            options: ["A legal union", "A political party", "A people gathered by God", "A physical building"],
+            correctIndex: 2,
+            analysis: "Biblically, the Church is fundamentally 'a people gathered by God' (ekklesia) rather than merely a structural building or temporal institution."
+        },
+        {
+            question: "In biblical terms, who does the Church include?",
+            options: ["Only ordained clergy and leaders", "Every person who belongs to Christ and has a personal relationship with him", "Only citizens born in 1st-century Palestine", "Anyone who resides within church property"],
+            correctIndex: 1,
+            analysis: "In scripture, membership in the Church encompasses all who belong to Christ and are joined to Him as living members of His spiritual Body."
+        },
+        {
+            question: "Why does belonging to Christ define membership in the Church biblically?",
+            options: ["Because Jesus is the Head and the faithful are his Body", "Because Jesus established a political empire", "Because the Apostles mandated strict voting rules", "Because Roman law required membership lists"],
+            correctIndex: 0,
+            analysis: "Belonging to Christ defines membership because believers are organically united to Him—Jesus is the Head and the faithful make up His living Body."
+        },
+        {
+            question: "Which verse states: 'Now you are the body of Christ and individually members of it'?",
+            options: ["Acts 1:8", "1 Corinthians 12:27", "Matthew 16:18", "Romans 12:1"],
+            correctIndex: 1,
+            analysis: "St. Paul explicitly uses this body metaphor in 1 Corinthians 12:27 to explain how diverse individual believers form one single body in Christ."
+        },
+        {
+            question: "The two summary definitions given for the Church are Christ's Body (a living unity with him) and what else?",
+            options: ["A strict judicial court", "A gathered people called together by God", "An elite philosophical school", "A national military force"],
+            correctIndex: 1,
+            analysis: "The summary definitions highlight the Church as both 'Christ's Body' (living internal spiritual union) and 'a gathered people called together by God'."
+        },
+        {
+            question: "In Scripture, Jesus is repeatedly referred to as which part of the Church?",
+            options: ["The foundation stone", "The Head", "The vessel", "The outer wall"],
+            correctIndex: 1,
+            analysis: "Scripture repeatedly designates Jesus Christ as the 'Head' who directs, sustains, and gives life to the Church, His Body."
+        },
+        {
+            question: "Correspondingly, how is the Church referred to in relation to Jesus?",
+            options: ["The 'kingdom of Earth'", "The 'body of Christ'", "The 'army of heaven'", "The 'temple of stone'"],
+            correctIndex: 1,
+            analysis: "In Pauline and New Testament theology, the Church is identified directly as the 'Body of Christ'."
+        },
+        {
+            question: "Specifically, scripture directly labels Jesus as the 'head of the...' what?",
+            options: ["State", "Body, the church", "Apostles' council", "Synagogue"],
+            correctIndex: 1,
+            analysis: "Colossians 1:18 explicitly designates Jesus: 'He is the head of the body, the church.'"
+        },
+        {
+            question: "In Matthew 16:18, to whom does Jesus say: 'And I tell you, you are Peter, and on this rock I will build my church...'?",
+            options: ["John", "Peter", "Paul", "James"],
+            correctIndex: 1,
+            analysis: "In Matthew 16:18, Jesus changes Simon's name to Peter (Petros/Rock) and promises to build His Church upon this rock foundation."
+        },
+        {
+            question: "According to Matthew 16:18, what will NOT prevail against the Church?",
+            options: ["The powers of Rome", "The gates of Hades", "The Jewish authorities", "The waves of the sea"],
+            correctIndex: 1,
+            analysis: "Jesus promises Peter in Matthew 16:18 that 'the gates of Hades (hell) shall not prevail against it,' assuring the Church's ultimate triumph and protection."
+        },
+        {
+            question: "Matthew 16:18 demonstrates that the Church is not an accidental human project, but rather what?",
+            options: ["A political federation", "Christ's Church, built on his promise and protected by divine power", "A temporal government established by Rome", "A temporary social experiment"],
+            correctIndex: 1,
+            analysis: "The passage confirms that the Church was intentionally instituted by Christ himself, secured by His divine word, and protected by supernatural power."
+        },
+        {
+            question: "Before his ascension in Acts 1:8, what does Jesus state the believers will receive when the Holy Spirit comes upon them?",
+            options: ["Wealth", "Power", "Political titles", "Instant total knowledge"],
+            correctIndex: 1,
+            analysis: "Jesus tells His disciples in Acts 1:8: 'You will receive power when the Holy Spirit comes upon you,' equipping them for global evangelization."
+        },
+        {
+            question: "According to Acts 1:8, where were the disciples called to be witnesses?",
+            options: ["In Jerusalem, in all Judea and Samaria, and to the ends of the earth", "Only in Rome and Greece", "Strictly within the borders of Galilee", "Only inside Jewish synagogues"],
+            correctIndex: 0,
+            analysis: "Acts 1:8 outlines the expanding geographic roadmap of early Christian mission: starting in Jerusalem, expanding to Judea/Samaria, and reaching the ends of the earth."
+        },
+        {
+            question: "Because it is empowered by the Holy Spirit and sent to proclaim Christ globally, the Church is defined as inherently what by nature?",
+            options: ["Monastic", "Missionary", "Static", "Academic"],
+            correctIndex: 1,
+            analysis: "The Church is inherently 'missionary by nature' because its central mandate is outward expansion through witnessing to all nations."
+        },
+        {
+            question: "In Acts 1:1–2, who is the recipient to whom the author is addressing the letter regarding all that Jesus did and taught?",
+            options: ["Timothy", "Theophilus", "Titus", "Barnabas"],
+            correctIndex: 1,
+            analysis: "Luke addresses both his Gospel and the Acts of the Apostles to 'Theophilus' (meaning 'lover of God')."
+        },
+        {
+            question: "Through whom did Jesus give instructions to the chosen apostles before he was taken up to heaven (Acts 1:2)?",
+            options: ["The Roman governor", "The Holy Spirit", "The High Priest", "The Pharisaic council"],
+            correctIndex: 1,
+            analysis: "Acts 1:2 explicitly states that Jesus gave instructions 'through the Holy Spirit to the apostles whom he had chosen'."
+        },
+        {
+            question: "In Acts 2:42, what is the FIRST essential practice to which early Christians devoted themselves?",
+            options: ["The apostles' teaching", "Building physical churches", "Political rallies", "Writing history books"],
+            correctIndex: 0,
+            analysis: "Acts 2:42 lists four essential practices of early Christian life, beginning with devotion to 'the apostles' teaching' (didache)."
+        },
+        {
+            question: "In Acts 2:42, what is the SECOND essential practice mentioned alongside the apostles' teaching?",
+            options: ["Canon law", "Fellowship (community)", "Military training", "Tax collection"],
+            correctIndex: 1,
+            analysis: "The second essential practice noted in Acts 2:42 is 'fellowship' (Greek: koinonia), reflecting community life and shared support."
+        },
+        {
+            question: "In Acts 2:42, what is the THIRD essential practice listed in the description of early Christian life?",
+            options: ["The breaking of bread", "Sacrificing animals", "Debate with philosophers", "Fasting from water"],
+            correctIndex: 0,
+            analysis: "The third practice listed in Acts 2:42 is 'the breaking of bread,' referring to early Eucharistic celebrations."
+        },
+        {
+            question: "In Acts 2:42, what is the FOURTH essential practice highlighted in early Christian living?",
+            options: ["Scholastic writing", "The prayers", "Architectural development", "Trade negotiation"],
+            correctIndex: 1,
+            analysis: "The fourth fundamental practice recorded in Acts 2:42 is devotion to 'the prayers' (communal and liturgical prayer life)."
+        },
+        {
+            question: "How is Church history defined in the handouts?",
+            options: ["A collection of human errors and political shifts", "The unfolding—recorded in time—of Jesus Christ's continuing work in the people of God through the Holy Spirit", "The study of European religious monarchs", "A legend created during the Middle Ages"],
+            correctIndex: 1,
+            analysis: "Church history is theological history: it records how Jesus continues His work in human history through the Holy Spirit in the lives of His people."
+        },
+        {
+            question: "In Matthew 13:31–32, what seed is used to describe the kingdom of heaven as starting small but becoming a large tree?",
+            options: ["Wheat seed", "Mustard seed", "Sesame seed", "Olive seed"],
+            correctIndex: 1,
+            analysis: "Jesus compares the Kingdom of Heaven to a mustard seed, illustrating how tiny beginnings grow into a expansive refuge across the earth."
+        },
+        {
+            question: "In Matthew 13:33, what agent placed in three measures of flour represents the kingdom of heaven?",
+            options: ["Salt", "Leaven", "Oil", "Water"],
+            correctIndex: 1,
+            analysis: "Jesus uses the parable of the leaven (yeast) in flour to show how the Kingdom transforms society invisibly yet thoroughly from within."
+        },
+        {
+            question: "What are the approximate dates given for the period of Ancient Christianity?",
+            options: ["AD 590–1517", "AD 001–590", "AD 1517–1860", "AD 1860–Present"],
+            correctIndex: 1,
+            analysis: "Ancient Christianity spans AD 001 to AD 590, covering the Apostolic Age, Roman persecutions, ecumenical councils, and early Church Fathers."
+        },
+        {
+            question: "What are the dates for Medieval Christianity, which saw the center of Christianity shift to Europe?",
+            options: ["AD 001–590", "AD 590–1517", "AD 1517–1860", "AD 1860–Present"],
+            correctIndex: 1,
+            analysis: "Medieval Christianity spans AD 590 (Pope Gregory the Great) to AD 1517 (Protestant Reformation), marking major European expansion."
+        },
+        {
+            question: "What dates define Modern Christianity, stretching from Martin Luther to the modern missionary movement?",
+            options: ["AD 590–1517", "AD 1517–1860", "AD 1860–Present", "c. 1500–1200 BC"],
+            correctIndex: 1,
+            analysis: "Modern Christianity spans AD 1517 to AD 1860, marked by the Reformation, global exploration, and religious shifts."
+        },
+        {
+            question: "Which period of Church history covers AD 1860–Present and includes responses to modern challenges like liberalism and fundamentalism?",
+            options: ["Ancient Christianity", "Contemporary Christianity", "Medieval Christianity", "Modern Christianity"],
+            correctIndex: 1,
+            analysis: "Contemporary Christianity covers AD 1860 to the present day, characterized by global shifts to the Global South and modern theological challenges."
+        },
+        {
+            question: "What is the primary focus of Theme 1: History of Missions?",
+            options: ["The growth and spread of the Church from Jerusalem to the ends of the earth", "The development of canon law and councils", "The structural evolution of church architecture", "The financial management of the Vatican"],
+            correctIndex: 0,
+            analysis: "Theme 1 focuses on missionary expansion—tracing how the Gospel traveled geographically and culturally from Jerusalem across the globe."
+        },
+        {
+            question: "Which Scripture passage is cited as key to Theme 1 (History of Missions)?",
+            options: ["Matthew 28:19–20 (\"Go therefore and make disciples...\")", "John 15:20", "Titus 1:5", "1 Peter 3:15"],
+            correctIndex: 0,
+            analysis: "Matthew 28:19–20 (The Great Commission) is the foundational text driving the history of Christian missions."
+        },
+        {
+            question: "What does Theme 2: History of Persecutions study?",
+            options: ["The monetary taxes paid by early believers", "The sufferings endured by Christians from the Roman Empire to modern-day martyrdom", "The debates over liturgical music", "The creation of monastic orders"],
+            correctIndex: 1,
+            analysis: "Theme 2 explores the hardship, persecution, and martyrdom experienced by believers standing firm in their faith across history."
+        },
+        {
+            question: "Which key verse is quoted under Theme 2 (History of Persecutions)?",
+            options: ["\"If they persecuted me, they will persecute you also.\" (John 15:20)", "\"Appoint elders in every town...\"", "\"Let your light shine...\"", "\"Always be prepared to make a defense...\""],
+            correctIndex: 0,
+            analysis: "John 15:20 explicitly highlights Jesus' warning to His followers that they would experience persecution as He did."
+        },
+        {
+            question: "What does Theme 3: History of Church Government & Discipline examine?",
+            options: ["How the Church has been governed from the Apostolic Age to the present", "The stylistic history of sacred vestments", "The global spread of agricultural techniques by monks", "Historical translations of the Old Testament"],
+            correctIndex: 0,
+            analysis: "Theme 3 examines organizational authority, leadership structures, councils, canon law, and disciplinary practices over time."
+        },
+        {
+            question: "What are the four key areas of focus under Theme 3 (Church Govt. & Discipline)?",
+            options: ["Monasteries, shrines, cathedrals, and parish halls", "Apostles, bishops, priests, and deacons; Church councils; Canon law; Church administration/discipline", "Kings, emperors, governors, and prefects", "Painting, sculpture, architecture, and music"],
+            correctIndex: 1,
+            analysis: "Theme 3 focuses on clerical orders (bishops, priests, deacons), ecumenical councils, canon law codes, and internal governance."
+        },
+        {
+            question: "Which verse is listed as a foundational scripture for Theme 3 (Church Govt. & Discipline)?",
+            options: ["\"Appoint elders in every town as I directed you.\" (Titus 1:5)", "Matthew 13:31", "1 Corinthians 12:27", "Acts 1:8"],
+            correctIndex: 0,
+            analysis: "Titus 1:5 establishes the biblical imperative for church leadership, directing Paul's disciple Titus to appoint local leaders (elders)."
+        },
+        {
+            question: "What is the core focus of Theme 4: History of Worship?",
+            options: ["The political relations between popes and kings", "The development of Christian worship, Eucharist, sacraments, liturgical traditions, and music", "Academic debates in medieval universities", "Missionary journeys across the Atlantic"],
+            correctIndex: 1,
+            analysis: "Theme 4 covers the evolution of Christian liturgical life, sacraments, praise, prayer traditions, and holy feasts."
+        },
+        {
+            question: "What four specific items are listed as the key focus for Theme 4 (History of Worship)?",
+            options: ["Early Christian worship, Development of liturgy, Sacraments, Feast days and devotions", "Canon law, Excommunication, Papal bulls, Synods", "Synagogues, Sanhedrin, Temple police, Tax collectors", "Monasticism, Hermits, Crusades, Pilgrimages"],
+            correctIndex: 0,
+            analysis: "Key elements of Theme 4 are early Christian assemblies, liturgical developments, sacramental practices, and devotional calendars."
+        },
+        {
+            question: "Which Bible passage is cited under Theme 4 to illustrate the centrality of early Christian worship?",
+            options: ["Titus 1:5", "Acts 2:42", "Matthew 16:18", "1 Peter 3:15"],
+            correctIndex: 1,
+            analysis: "Acts 2:42 illustrates worship at the Church's core, highlighting breaking of bread (Eucharist) and communal prayer."
+        },
+        {
+            question: "What does Theme 5: History of Christian Life examine?",
+            options: ["How Christians lived out their faith in daily life through holiness, charity, education, and social service", "The precise formulation of official creeds", "Military conquests during the Crusades", "The legal codes of Roman emperors"],
+            correctIndex: 0,
+            analysis: "Theme 5 explores practical lived faith—charity, morality, education, family, and public witness in everyday society."
+        },
+        {
+            question: "What are the four items listed under Key Focus for Theme 5 (History of Christian Life)?",
+            options: ["Christian spirituality, Monasticism, Works of mercy, Christian witness in society", "Bishops, Deacons, Popes, Cardinals", "Liturgy, Sacraments, Feast days, Music", "Heresy, Excommunication, Trials, Councils"],
+            correctIndex: 0,
+            analysis: "Key focus points for Theme 5 are spiritual traditions, monastic movements, charitable works of mercy, and social witness."
+        },
+        {
+            question: "Which Scripture passage is quoted as the lead text for Theme 5 (History of Christian Life)?",
+            options: ["\"Let your light shine before others...\" (Matthew 5:16)", "\"Go therefore and make disciples...\"", "\"You are Peter...\"", "\"Appoint elders in every town...\""],
+            correctIndex: 0,
+            analysis: "Matthew 5:16 inspires practical Christian living by commanding believers to let their good deeds shine before others."
+        },
+        {
+            question: "What does Theme 6: History of Theology trace?",
+            options: ["The economic transactions of churches", "The Church's understanding and explanation of Christian doctrine", "The architectural styles of ancient basilicas", "The agricultural work of medieval monasteries"],
+            correctIndex: 1,
+            analysis: "Theme 6 traces intellectual history: how the Church articulated, defended, and deepened its understanding of revealed truth."
+        },
+        {
+            question: "What four topics are highlighted under Key Focus for Theme 6 (History of Theology)?",
+            options: ["Church Fathers, Creeds and Councils, Christian doctrine, Theological writings and literature", "Works of mercy, Daily life, Family life, Education", "Missions, Persecution, Martyrdom, Catacombs", "Taxes, Trade routes, Roman roads, Prefects"],
+            correctIndex: 0,
+            analysis: "Theme 6 focuses on the early Church Fathers, formal creedal statements, doctrinal formulations, and academic writings."
+        },
+        {
+            question: "Which key verse is quoted for Theme 6 (History of Theology)?",
+            options: ["\"Always be prepared to make a defense to anyone who calls you to account...\" (1 Peter 3:15)", "Acts 1:8", "Matthew 13:33", "John 15:20"],
+            correctIndex: 0,
+            analysis: "1 Peter 3:15 provides the scriptural basis for theology and apologetics: being prepared to give a reasoned defense for one's faith."
+        },
+        {
+            question: "According to the handouts, why do we study Church History?",
+            options: ["To memorize ancient dates for academic competitions", "To understand how Jesus founded the Church, how the Gospel spread, and how Christians remained faithful", "To prove that secular governments are unnecessary", "To critique ancient artistic styles"],
+            correctIndex: 1,
+            analysis: "Studying Church History reveals our spiritual roots: understanding Christ's founding, the spread of faith, and lessons in perseverance."
+        },
+        {
+            question: "How does studying Church History benefit a Christian's faith today?",
+            options: ["It helps learn from the saints, understand doctrine development, and strengthen commitment to Christ's mission", "It grants automatic political authority in local government", "It eliminates the need for personal prayer and sacraments", "It teaches how to build ancient architectural structures"],
+            correctIndex: 0,
+            analysis: "It anchors modern believers by providing inspiration from saints, understanding doctrinal roots, and renewing missionary zeal."
+        },
+        {
+            question: "In the Four Marks of the Church, what does 'One' mean?",
+            options: ["Open to all people, cultures, and times", "United in one God, one faith, one Pope, and the same sacraments", "Built on the Apostles", "Guided by secular laws"],
+            correctIndex: 1,
+            analysis: "The mark 'One' signifies unity in faith, belief in one God, shared sacramental life, and common leadership under the Pope."
+        },
+        {
+            question: "In the Four Marks of the Church, what does 'Holy' signify?",
+            options: ["Built exclusively out of gold and marble", "Founded by Jesus, guided by the Holy Spirit, and helps people become saints", "Governed strictly by civil authorities", "Existing only in heavenly dimensions"],
+            correctIndex: 1,
+            analysis: "The mark 'Holy' stems from its divine Founder (Jesus), its guide (the Holy Spirit), and its objective to sanctify believers."
+        },
+        {
+            question: "What is the direct definition of 'Catholic' in the Four Marks?",
+            options: ["Universal: open to all people, cultures, and times", "Restricted to the city of Rome", "Governed by ancient philosophers", "Originating solely in 16th-century Europe"],
+            correctIndex: 0,
+            analysis: "'Catholic' comes from the Greek 'katholikos', meaning universal—sent to all peoples across all places and ages."
+        },
+        {
+            question: "In the Four Marks, what does 'Apostolic' mean?",
+            options: ["Written entirely in Greek", "Built on the Apostles, with bishops as their successors", "Confined to the first century AD", "Managed by military leaders"],
+            correctIndex: 1,
+            analysis: "'Apostolic' means rooted in the foundation and teachings of the Apostles, preserved through uninterrupted apostolic succession."
+        },
+        {
+            question: "Where was Palestine geographically situated, making it a strategic crossroads of trade, culture, and military campaigns?",
+            options: ["Between North and South America", "Between Asia, Africa, and Europe", "Between Scandinavia and Britain", "Between India and China"],
+            correctIndex: 1,
+            analysis: "Palestine sat at the land bridge connecting three continents (Asia, Africa, and Europe), making it a major commercial and military corridor."
+        },
+        {
+            question: "What was the direct historical consequence of Palestine's strategic location?",
+            options: ["It remained completely isolated from outside contact", "It was repeatedly conquered and governed by foreign powers", "It never developed an agricultural economy", "It was quickly abandoned by all human settlement"],
+            correctIndex: 1,
+            analysis: "Because of its strategic location as a land bridge, empires constantly fought for control over Palestine throughout ancient history."
+        },
+        {
+            question: "How did these successive foreign occupations impact the environment into which Jesus was born?",
+            options: ["They shaped its political, social, and religious environment", "They forced all residents to adopt Latin as their sole language", "They destroyed all religious practice in the region", "They converted Palestine into a purely secular state"],
+            correctIndex: 0,
+            analysis: "Continuous foreign rule blended Hellenistic culture, Roman law, and foreign administration into the backdrop of Jesus' lifetime."
+        },
+        {
+            question: "By the time of Jesus' birth, Palestine had become part of which empire following Pompey's conquest in 63 BC?",
+            options: ["Persian Empire", "Roman Empire", "Greek Empire", "Egyptian Empire"],
+            correctIndex: 1,
+            analysis: "General Pompey conquered Jerusalem in 63 BC, incorporating Palestine into the expanding Roman Empire prior to Jesus' birth."
+        },
+        {
+            question: "Which major foreign power exercised influence over Palestine during c. 1500–1200 BC?",
+            options: ["Egypt", "Assyrian Empire", "Neo-Babylonian Empire", "Persian Empire"],
+            correctIndex: 0,
+            analysis: "During the Bronze Age era (c. 1500–1200 BC), ancient Egypt was the dominant regional power influencing Canaan/Palestine."
+        },
+        {
+            question: "Which power ruled Palestine during the period of 722–612 BC?",
+            options: ["Egyptian Empire", "Assyrian Empire", "Roman Empire", "Greek Empire"],
+            correctIndex: 1,
+            analysis: "The brutal Assyrian Empire dominated the ancient Near East and conquered the northern kingdom of Israel in 722 BC."
+        },
+        {
+            question: "Which foreign power controlled Palestine during 586–539 BC?",
+            options: ["Neo-Babylonian Empire", "Persian Empire", "Roman Empire", "Jewish Hasmoneans"],
+            correctIndex: 0,
+            analysis: "The Neo-Babylonian Empire under Nebuchadnezzar destroyed Jerusalem and the Temple in 586 BC, taking Jews into exile."
+        },
+        {
+            question: "Which power governed Palestine during 539–332 BC?",
+            options: ["Persian Empire", "Assyrian Empire", "Greek Empire", "Roman Empire"],
+            correctIndex: 0,
+            analysis: "Cyrus the Great conquered Babylon in 539 BC, establishing Persian rule and allowing Jewish exiles to return and rebuild the Temple."
+        },
+        {
+            question: "Who led the foreign rule over Palestine during 332–167 BC?",
+            options: ["Pompey and Augustus", "Alexander the Great and Successors", "Cyrus the Great", "Nebuchadnezzar"],
+            correctIndex: 1,
+            analysis: "Alexander the Great conquered the Persian Empire in 332 BC, ushering in Hellenistic Greek rule under Ptolemaic and Seleucid dynasties."
+        },
+        {
+            question: "What era of rule occurred in Palestine during 167–63 BC?",
+            options: ["Roman Rule", "Hasmonean Independence (Jewish Rule)", "Egyptian Influence", "Persian Rule"],
+            correctIndex: 1,
+            analysis: "Following the Maccabean Revolt, Judea secured a period of Jewish self-rule under the Hasmonean dynasty from 167 to 63 BC."
+        },
+        {
+            question: "Which foreign power ruled Palestine from 63 BC onward?",
+            options: ["Roman Empire", "Neo-Babylonian Empire", "Assyrian Empire", "Greek Empire"],
+            correctIndex: 0,
+            analysis: "Roman rule began in 63 BC with General Pompey and continued through the New Testament era and beyond."
+        },
+        {
+            question: "Which ruler of the Greek period (175–164 BC) actively persecuted the Jewish people and tried to suppress their religious practices?",
+            options: ["Alexander the Great", "Antiochus IV Epiphanes", "Herod the Great", "Cyrus the Great"],
+            correctIndex: 1,
+            analysis: "Seleucid ruler Antiochus IV Epiphanes attempted to forcefully Hellenize Judea and eradicate traditional Jewish worship."
+        },
+        {
+            question: "Which of the following was NOT one of the ways Antiochus IV suppressed Jewish religious practices?",
+            options: ["Banning circumcision", "Forbidding Sabbath observance", "Prohibiting Torah reading", "Mandating Christian baptism"],
+            correctIndex: 3,
+            analysis: "Antiochus IV lived in the 2nd century BC, long before Christianity or Christian baptism existed."
+        },
+        {
+            question: "What severe act by Antiochus IV inside the Jerusalem Temple helped trigger armed Jewish resistance?",
+            options: ["Expanding the outer courtyard", "Desecrating the Temple and ordering sacrifices to Greek gods", "Selling the Temple to Roman merchants", "Translating the Torah into Latin"],
+            correctIndex: 1,
+            analysis: "Antiochus IV set up an altar to Zeus inside the Temple (the 'abomination of desolation') and sacrificed swine, inciting revolt."
+        },
+        {
+            question: "What historical uprising was directly provoked by the persecutions of Antiochus IV between 167–160 BC?",
+            options: ["The Zealot Rebellion", "The Maccabean Revolt", "The Bar Kokhba Revolt", "The Roman Civil War"],
+            correctIndex: 1,
+            analysis: "Mattathias and his sons (notably Judas Maccabeus) launched the Maccabean Revolt to free Judea from Seleucid religious tyranny."
+        },
+        {
+            question: "The success of the Maccabean Revolt led to the establishment of an independent Jewish state in 142 BC under which dynasty?",
+            options: ["Herodian dynasty", "Hasmonean dynasty", "Davidic dynasty", "Ptolemaic dynasty"],
+            correctIndex: 1,
+            analysis: "The victorious Maccabees established the Hasmonean dynasty, ruling an independent Jewish kingdom until 63 BC."
+        },
+        {
+            question: "Which Roman general ended Hasmonean Jewish independence by conquering Jerusalem in 63 BC?",
+            options: ["Julius Caesar", "General Pompey", "Mark Antony", "Titus"],
+            correctIndex: 1,
+            analysis: "Roman General Pompey intervened in a Hasmonean civil war, besieged Jerusalem in 63 BC, and subjugated Judea to Rome."
+        },
+        {
+            question: "Who was the very first Roman Emperor?",
+            options: ["Julius Caesar", "Augustus", "Tiberius", "Nero"],
+            correctIndex: 1,
+            analysis: "Octavian was granted the title Augustus by the Senate in 27 BC, becoming Rome's first official Emperor."
+        },
+        {
+            question: "What is the Latin term for the long period of peace experienced across the empire during the reign of Augustus?",
+            options: ["Pax Romana", "Lex Romana", "Via Appia", "Imperium Romanum"],
+            correctIndex: 0,
+            analysis: "Pax Romana ('Roman Peace') describes the period of relative stability across the Mediterranean that facilitated trade and communication."
+        },
+        {
+            question: "Which four specific features of the Pax Romana directly enabled early Christian missionaries to evangelize rapidly?",
+            options: ["Common language, intricate road systems, a legal system, and strong military force", "Free food, tax exemptions, mandatory conversion laws, and naval fleets", "High inflation, isolated cities, desert trails, and localized languages", "Democratic voting, public libraries, free accommodation, and open borders"],
+            correctIndex: 0,
+            analysis: "Widespread Greek/Latin, Roman paved highways, legal protections, and military security allowed apostles to travel and spread the Gospel safely."
+        },
+        {
+            question: "Why did most Jewish people in the 1st century hate Roman rule?",
+            options: ["Because they viewed it as another form of oppression following centuries under foreign conquerors", "Because Rome forced all Jews to move to Italy", "Because Rome outlawed all trade in Palestine", "Because Roman soldiers destroyed all Jewish scriptures"],
+            correctIndex: 0,
+            analysis: "Jews resented Gentile Roman control, high taxation, and pagan governance over their God-given Promised Land."
+        },
+        {
+            question: "Whom did Rome appoint as King of Judea to rule from 37 to 4 BC?",
+            options: ["Herod Antipas", "Herod the Great", "Pontius Pilate", "Archelaus"],
+            correctIndex: 1,
+            analysis: "The Roman Senate named Herod the Great 'King of the Jews', ruling Judea as a client king from 37 BC until his death in 4 BC."
+        },
+        {
+            question: "Herod the Great was historically known for being a skilled but ruthless ruler defined by what two key traits?",
+            options: ["Ambitious building projects and severe paranoia", "Intellectual writing and deep humility", "Pacifism and opposition to taxation", "Devotion to monasticism and poverty"],
+            correctIndex: 0,
+            analysis: "Herod was famous for massive architectural wonders (like expanding the Jerusalem Temple) alongside murderous paranoia regarding rivals."
+        },
+        {
+            question: "Following the death of Herod the Great in 4 BC, what happened to his kingdom?",
+            options: ["It was immediately given back to Hasmonean kings", "It was divided among his three sons (Archelaus, Herod Antipas, and Philip)", "It was annexed directly into the Parthian Empire", "It was turned into a democratic republic"],
+            correctIndex: 1,
+            analysis: "Rome divided Herod's territory among his sons: Archelaus (Judea/Samaria), Herod Antipas (Galilee/Perea), and Philip (Iturea/Trachonitis)."
+        },
+        {
+            question: "When Judea later came under direct Roman administration, what type of officials governed it (such as Pontius Pilate)?",
+            options: ["Prefects / Procurators", "High Priests", "Kings", "Emperors"],
+            correctIndex: 0,
+            analysis: "Direct Roman oversight was handed to equestrian governors styled as Prefects or Procurators, like Pontius Pilate (AD 26–36)."
+        },
+        {
+            question: "Under Roman rule in the 1st century, what condition did Rome require of subject nations in order to allow local customs and religious practices?",
+            options: ["They had to adopt Greek paganism", "They had to pay taxes and maintain loyalty", "They had to serve in the Roman legion", "They had to speak only Latin in public"],
+            correctIndex: 1,
+            analysis: "Rome allowed religious freedom and local administrative customs provided provinces paid their taxes and suppressed rebellions."
+        },
+        {
+            question: "Which major Jewish group in 1st-century society was known for emphasizing strict observance of the Law?",
+            options: ["Sadducees", "Pharisees", "Essenes", "Zealots"],
+            correctIndex: 1,
+            analysis: "The Pharisees were a popular religious movement dedicated to meticulous keeping of the written Torah and oral traditions."
+        },
+        {
+            question: "Which Jewish group comprised the priestly and aristocratic elite who controlled the Jerusalem Temple?",
+            options: ["Sadducees", "Pharisees", "Samaritans", "Galileans"],
+            correctIndex: 0,
+            analysis: "The Sadducees were wealthy aristocratic families and high-priestly clans who held dominant political influence over Temple operations."
+        },
+        {
+            question: "What three main pillars formed the foundation of the 1st-century Palestinian economy?",
+            options: ["Agriculture, Trade, and Construction", "Mining, Shipbuilding, and Textile manufacturing", "Banking, International shipping, and Pottery", "Papyrus production, Slave trade, and Weaponry"],
+            correctIndex: 0,
+            analysis: "Palestine's 1st-century economy relied primarily on farming/livestock, local and regional trade, and major construction projects."
+        },
+        {
+            question: "What were the major agricultural crops produced in 1st-century Palestine?",
+            options: ["Apples, oranges, corn, and wheat", "Olives, figs, dates, grapes, and grain", "Rice, sugar, tea, and spices", "Cotton, tobacco, potatoes, and barley"],
+            correctIndex: 1,
+            analysis: "Mediterranean farming relied heavily on staple crops: olive oil, figs, dates, vineyards for wine, and fields of wheat and barley."
+        },
+        {
+            question: "Besides farming and construction, what major industry was prominent on the Sea of Galilee?",
+            options: ["Pearl diving", "Fishing", "Salt mining", "Cargo shipbuilding"],
+            correctIndex: 1,
+            analysis: "Fishing was a thriving commercial enterprise around Galilee, engaging several disciples of Jesus (e.g., Peter, Andrew, James, John)."
+        },
+        {
+            question: "What major factor provided employment for thousands of workers during this era?",
+            options: ["King Herod's massive construction projects", "The building of the Roman navy", "The construction of the Via Appia", "Exporting timber to Egypt"],
+            correctIndex: 0,
+            analysis: "Herod the Great's monumental works (Temple expansion, Caesarea Maritima port, fortresses) provided massive public works employment."
+        },
+        {
+            question: "What created a heavy economic burden on ordinary people, leading to a stark economic divide between rich and poor?",
+            options: ["Heavy Roman taxation and supporting the Temple", "Severe drought lasting a hundred years", "Lack of trade routes through Palestine", "High costs of imported Greek books"],
+            correctIndex: 0,
+            analysis: "Peasants faced dual taxation burden: compulsory Roman imperial levies alongside traditional religious Temple tithes."
+        },
+        {
+            question: "Besides the Jewish majority, which ethnic/cultural groups lived in 1st-century Palestine?",
+            options: ["Greeks, Romans, Samaritans, and Syrians", "Persians, Egyptians, Celts, and Ethiopic tribes", "Carthaginians, Gauls, Scythians, and Parthians", "Britons, Iberians, Germans, and Slavs"],
+            correctIndex: 0,
+            analysis: "Palestine housed a diverse population including Hellenized Greeks, Roman personnel, neighboring Samaritans, and Syrian traders."
+        },
+        {
+            question: "What was the everyday spoken language of the Jewish people in 1st-century Palestine?",
+            options: ["Greek", "Aramaic", "Latin", "Hebrew"],
+            correctIndex: 1,
+            analysis: "Aramaic (a Semitic language closely related to Hebrew) was the common primary vernacular spoken daily by 1st-century Jews."
+        },
+        {
+            question: "In 1st-century Palestine, which language was primarily reserved for Jewish worship?",
+            options: ["Aramaic", "Hebrew", "Greek", "Latin"],
+            correctIndex: 1,
+            analysis: "Hebrew was preserved as the sacred liturgical language used for reading the Torah and synagogue prayers."
+        },
+        {
+            question: "Which language was used across 1st-century Palestine for trade and general administration?",
+            options: ["Aramaic", "Greek", "Latin", "Hebrew"],
+            correctIndex: 1,
+            analysis: "Koine Greek served as the universal lingua franca across the eastern Mediterranean for international commerce and diplomacy."
+        },
+        {
+            question: "Which language was used in 1st-century Palestine specifically by Roman officials?",
+            options: ["Aramaic", "Latin", "Greek", "Hebrew"],
+            correctIndex: 1,
+            analysis: "Latin was the official state language used by Roman legions, legal courts, and high government governance."
+        },
+        {
+            question: "Village life in 1st-century Palestine was centered around which two locations?",
+            options: ["The marketplace and synagogue", "The Roman amphitheater and baths", "The palace and military barracks", "The seaport and judicial court"],
+            correctIndex: 0,
+            analysis: "Local Jewish village community life revolved around the open-air marketplace for trade and the synagogue for worship and learning."
+        },
+        {
+            question: "What were typical homes like in 1st-century Palestinian villages?",
+            options: ["Multi-story marble villas with private gardens", "Simple 1–2 room square dwellings arranged around shared courtyards", "Underground stone bunkers without doors", "Wooden multi-room apartments"],
+            correctIndex: 1,
+            analysis: "Ordinary homes were modest 1–2 room flat-roofed structures constructed from mudbrick or basalt, opening into communal courtyards."
+        },
+        {
+            question: "What foods comprised the simple daily diet of people in 1st-century Palestine?",
+            options: ["Beef, pork, poultry, and exotic spices", "Bread, cheese, fish, vegetables, fruits, and wine", "Rice, beans, maize, and tropical fruit", "Venison, potatoes, oats, and beer"],
+            correctIndex: 1,
+            analysis: "The standard diet was Mediterranean simplicity: grain bread as the staple, goat cheese, dried/salted fish, lentils, figs, olives, and wine."
+        },
+        {
+            question: "What were the basic items of clothing worn in 1st-century daily life?",
+            options: ["Toga and sandals", "Tunics and outer cloaks", "Heavy woolen coats and boots", "Silk robes and headbands"],
+            correctIndex: 1,
+            analysis: "Common attire consisted of an inner linen or woolen tunic paired with an outer cloak (himation) that doubled as a blanket."
+        },
+        {
+            question: "What role did the husband hold within the 1st-century Jewish family structure?",
+            options: ["Chief political delegate to Rome", "Spiritual and legal head of the house", "Sole manager of domestic cooking", "Synagogue high priest"],
+            correctIndex: 1,
+            analysis: "1st-century Jewish society was patriarchal; the husband served as the recognized legal, economic, and spiritual authority of his household."
+        },
+        {
+            question: "What were the vital, respected roles played by women in 1st-century Jewish family life?",
+            options: ["Managing domestic life, food preparation, and family affairs", "Serving in local town militias", "Conducting commercial shipping to Rome", "Governing provincial courts"],
+            correctIndex: 0,
+            analysis: "Women managed household operations, food preservation, textile production, child raising, and domestic economic affairs."
+        },
+        {
+            question: "How do the New Testament Gospels treat women within Jesus' ministry?",
+            options: ["They ignore women entirely", "They prominently highlight women among Jesus' followers", "They forbid women from listening to Jesus", "They describe women strictly as political adversaries"],
+            correctIndex: 1,
+            analysis: "The Gospels uniquely emphasize women as active followers, patrons, witnesses to the Resurrection, and key figures in Jesus' ministry."
+        },
+        {
+            question: "Jewish life in 1st-century Palestine was strictly defined by what theological belief?",
+            options: ["Polytheism", "Strict Monotheism", "Pantheism", "Agnosticism"],
+            correctIndex: 1,
+            analysis: "Judaism stood out in the pagan Roman world for its fierce devotion to strict Monotheism—belief in the One true God (Yahweh)."
+        },
+        {
+            question: "What three pillars centered Jewish religious practice in daily life?",
+            options: ["Observance of the Sabbath, study of the Torah, and worship at the Jerusalem Temple", "Military service, pagan sacrifice, and emperor worship", "Philosophical debate, athletic contests, and legal appeals", "Fasting from meat, monastic vows, and pilgrimage to Rome"],
+            correctIndex: 0,
+            analysis: "Jewish religious identity was anchored in weekly Sabbath rest, instruction in the Torah, and sacrificial worship at the Jerusalem Temple."
+        },
+        {
+            question: "Which major religious festival drew thousands of Jewish pilgrims to Jerusalem each year?",
+            options: ["Saturnalia", "Passover", "Hanukkah", "Pentecost"],
+            correctIndex: 1,
+            analysis: "Passover (Pesach) was the primary pilgrimage feast drawing hundreds of thousands of Jews to Jerusalem to commemorate the Exodus."
+        },
+        {
+            question: "What anticipation did many 1st-century Jewish people eagerly hold regarding their national future?",
+            options: ["Awaiting the arrival of a new Roman governor", "Eagerly awaiting the Messiah to bring salvation and liberation", "Expecting complete integration into Greek culture", "Hoping for the destruction of the Temple"],
+            correctIndex: 1,
+            analysis: "Under Roman subjugation, Jewish society was filled with intense expectation for the promised Messiah to deliver them."
+        },
+        {
+            question: "What was the primary character and purpose of education for 1st-century Jews?",
+            options: ["It was athletic and military in character", "It was religious in character and centered on preserving the covenant with God through the Torah", "It focused strictly on financial trade skills", "It focused on secular political science"],
+            correctIndex: 1,
+            analysis: "Jewish education was essentially religious and moral, aimed at forming pious covenant keepers who knew and lived God's Law."
+        },
+        {
+            question: "Which local institution served as a key learning and community center where Rabbis taught?",
+            options: ["The Roman Gymnasium", "The Synagogue", "The Forum", "The Amphitheater"],
+            correctIndex: 1,
+            analysis: "The local synagogue served as schoolhouse, prayer hall, and community center where rabbis instructed adults and youth in Scripture."
+        },
+        {
+            question: "How did Jewish boys begin their basic education at an early age?",
+            options: ["Memorizing Scripture and learning the Law", "Practicing Greek philosophy and rhetoric", "Learning Roman military tactics", "Training in architectural construction"],
+            correctIndex: 0,
+            analysis: "Young boys began formal learning around age 5 to 6 by memorizing passages from the Hebrew scriptures (especially the Torah)."
+        },
+        {
+            question: "Where were Jewish girls primary educated in family and religious traditions?",
+            options: ["In Roman academies", "At home", "At foreign boarding schools", "In public guild halls"],
+            correctIndex: 1,
+            analysis: "Girls received domestic, practical, and religious training within the household environment led by mothers and female elders."
+        },
+        {
+            question: "How were advanced studies conducted for young Jewish men?",
+            options: ["Through discipleship with respected rabbis using discussion and memorization", "By attending universities in Alexandria", "By writing legal briefs for Roman courts", "Through solitary meditation in the wilderness"],
+            correctIndex: 0,
+            analysis: "Higher Jewish education operated on a master-disciple relationship where students attached themselves to a respected rabbi to learn through dialogical debate."
+        },
+        {
+            question: "What did Greek education (the gymnasium) emphasize, in contrast to Jewish education?",
+            options: ["Knowledge of God, moral formation, and obedience to the Law", "Athletics, rhetoric, and philosophy", "Scripture memorization and liturgical chant", "Domestic management and cooking"],
+            correctIndex: 1,
+            analysis: "Hellenistic Greek gymnasia prioritized physical training (athletics), public speaking (rhetoric), and secular philosophical debate."
+        },
+        {
+            question: "In contrast to Greek education, what three things did Jewish education prioritize?",
+            options: ["Athletics, rhetoric, and philosophy", "Knowledge of God, moral formation, and obedience to the Law", "Military tactics, political science, and law", "Commerce, navigation, and mathematics"],
+            correctIndex: 1,
+            analysis: "Jewish instruction valued knowing Yahweh, developing personal holiness/morality, and faithful obedience to God's commandments."
+        },
+        {
+            question: "What do the Gospels indicate regarding Jesus' personal education?",
+            options: ["He received no education whatsoever", "He received a strong religious education, demonstrating deep knowledge of Scripture", "He was educated in Athens, Greece", "He studied strictly under Roman legal scholars"],
+            correctIndex: 1,
+            analysis: "The Gospels portray Jesus as deeply educated in Jewish sacred texts, reading and teaching authoritatively in local synagogues."
+        },
+        {
+            question: "Where did Jesus demonstrate his deep scriptural knowledge from a young age according to Luke 2:46–47 and 4:16–21?",
+            options: ["In synagogues and the Temple", "In the Roman Senate", "In Greek academies", "In Herod's palace"],
+            correctIndex: 0,
+            analysis: "Luke records 12-year-old Jesus astonishing teachers in the Jerusalem Temple and later reading Isaiah in His hometown synagogue in Nazareth."
+        },
+        {
+            question: "Which foreign power ruled Palestine during the period 332–167 BC prior to the Hasmonean Revolt?",
+            options: ["Alexander the Great and Successors", "Roman Empire", "Neo-Babylonian Empire", "Assyrian Empire"],
+            correctIndex: 0,
+            analysis: "During 332–167 BC, Palestine was ruled by Alexander the Great followed by the Ptolemaic and Seleucid Greek dynasties."
+        },
+        {
+            question: "Which foreign power ruled during 586–539 BC, destroying the Temple and taking captives?",
+            options: ["Neo-Babylonian Empire", "Persian Empire", "Roman Empire", "Greek Empire"],
+            correctIndex: 0,
+            analysis: "The Neo-Babylonian Empire destroyed Solomonic Jerusalem in 586 BC, commencing the Babylonian Exile."
+        },
+        {
+            question: "Which theme of Church History covers 'The Management of the Church'?",
+            options: ["History of Missions", "History of Church Govt. & Discipline", "History of Persecutions", "History of Theology"],
+            correctIndex: 1,
+            analysis: "Theme 3 is explicitly titled 'History of Church Govt. & Discipline: The Management of the Church'."
+        }
+    ];
+
+    const TOTAL_QUESTIONS = quizData.length; 
+    let currentScore = 0;
+    let answeredCount = 0;
+
+    // Fisher-Yates shuffle algorithm
+    function shuffleArray(array) {
+        let shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function initQuiz() {
+        document.querySelectorAll('.total-count').forEach(el => el.textContent = TOTAL_QUESTIONS);
+        const quizContainer = document.getElementById('quiz-container');
+
+        // 1. Randomize items order
+        const randomizedQuestions = shuffleArray(quizData);
+
+        randomizedQuestions.forEach((qData, qIndex) => {
+            // 2. Map original choices to preserve tracking of correct answer
+            let formattedChoices = qData.options.map((optText, origIndex) => ({
+                text: optText,
+                isCorrect: origIndex === qData.correctIndex
+            }));
+
+            // 3. Randomize choices order
+            formattedChoices = shuffleArray(formattedChoices);
+
+            const qCard = document.createElement('div');
+            qCard.className = 'question-card';
+            qCard.id = `q-${qIndex}`;
+
+            const labels = ['A', 'B', 'C', 'D'];
+            let optionsHTML = '';
+
+            formattedChoices.forEach((choice, cIndex) => {
+                optionsHTML += `
+                    <div class="option" data-correct="${choice.isCorrect}" onclick="checkAnswer('q-${qIndex}', this)">
+                        ${labels[cIndex]}. ${choice.text}
+                    </div>
+                `;
+            });
+
+            qCard.innerHTML = `
+                <div class="question-text">${qIndex + 1}. ${qData.question}</div>
+                <div class="options-list">${optionsHTML}</div>
+                <div class="analysis-box">
+                    <div class="analysis-title">AI Analysis</div>
+                    <p class="analysis-text">${qData.analysis}</p>
+                </div>
+            `;
+
+            quizContainer.appendChild(qCard);
+        });
+    }
+
+    function checkAnswer(questionCardId, selectedOption) {
+        const card = document.getElementById(questionCardId);
+        if (card.getAttribute('data-answered') === 'true') return;
+        card.setAttribute('data-answered', 'true');
+
+        const options = card.querySelectorAll('.option');
+        const analysisBox = card.querySelector('.analysis-box');
+        const isSelectedCorrect = selectedOption.getAttribute('data-correct') === 'true';
+
+        options.forEach((opt) => {
+            opt.classList.add('disabled');
+            const isOptCorrect = opt.getAttribute('data-correct') === 'true';
+
+            if (opt === selectedOption) {
+                if (isSelectedCorrect) {
+                    opt.classList.add('correct');
+                    opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer (Your answer)</span>`;
+                    currentScore++;
+                } else {
+                    opt.classList.add('wrong');
+                    opt.innerHTML += ` <span class="status-tag wrong-tag">✕ Your answer</span>`;
+                }
+            } else if (isOptCorrect) {
+                opt.classList.add('correct');
+                opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+            }
+        });
+
+        if (analysisBox) {
+            analysisBox.style.display = 'block';
+        }
+
+        answeredCount++;
+        document.getElementById('score-counter').textContent = currentScore;
+        document.getElementById('answered-counter').textContent = answeredCount;
+    }
+
+    window.onload = initQuiz;
+</script>
+
+</body>
+</html>
