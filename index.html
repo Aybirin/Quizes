@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSCE 2A-1 QUIZES</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --accent-blue: #58a6ff;
+            --border-color: #30363d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .folder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Folder Styling (using native details/summary) */
+        details.folder {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        details.folder[open] {
+            border-color: var(--accent-blue);
+        }
+
+        summary.folder-title {
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            background-color: var(--card-bg);
+            transition: background-color 0.2s;
+        }
+
+        summary.folder-title:hover {
+            background-color: var(--option-hover);
+        }
+
+        /* Hide default arrow and create custom indicator */
+        summary.folder-title::-webkit-details-marker {
+            display: none;
+        }
+
+        summary.folder-title::before {
+            content: "📁 ";
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        details[open] > summary.folder-title::before {
+            content: "📂 ";
+        }
+
+        summary.folder-title::after {
+            content: "►";
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        details[open] > summary.folder-title::after {
+            transform: rotate(90deg);
+            color: var(--accent-blue);
+        }
+
+        .folder-content {
+            padding: 10px 20px 20px 20px;
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Nested Folder (e.g. PRELIM) */
+        details.subfolder {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        summary.subfolder-title {
+            padding: 12px 16px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        summary.subfolder-title::-webkit-details-marker {
+            display: none;
+        }
+
+        summary.subfolder-title::before {
+            content: "📁 ";
+            margin-right: 8px;
+        }
+
+        details[open] > summary.subfolder-title::before {
+            content: "📂 ";
+        }
+
+        summary.subfolder-title::after {
+            content: "►";
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        details[open] > summary.subfolder-title::after {
+            transform: rotate(90deg);
+        }
+
+        .subfolder-content {
+            padding: 8px 12px 12px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Quiz Redirect Links */
+        .quiz-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            background-color: var(--option-bg);
+            color: var(--accent-blue);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .quiz-link:hover {
+            background-color: var(--option-hover);
+            border-color: var(--accent-blue);
+        }
+
+        .quiz-link::before {
+            content: "📄";
+            margin-right: 10px;
+        }
+
+        .empty-notice {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding: 8px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">BSCE 2A-1 QUIZES</h1>
+        <div class="subtitle">Select a subject folder to access quizzes</div>
+    </div>
+
+    <div class="folder-list">
+        <!-- Subject A -->
+        <details class="folder">
+            <summary class="folder-title">Subject A</summary>
+            <div class="folder-content">
+                <div class="empty-notice">No quizzes uploaded yet.</div>
+            </div>
+        </details>
+
+        <!-- Subject B -->
+        <details class="folder">
+            <summary class="folder-title">Subject B</summary>
+            <div class="folder-content">
+                <div class="empty-notice">No quizzes uploaded yet.</div>
+            </div>
+        </details>
+
+        <!-- Subject C -->
+        <details class="folder">
+            <summary class="folder-title">Subject C</summary>
+            <div class="folder-content">
+                <div class="empty-notice">No quizzes uploaded yet.</div>
+            </div>
+        </details>
+
+        <!-- THEOLOGY 103 -->
+        <details class="folder">
+            <summary class="folder-title">THEOLOGY 103</summary>
+            <div class="folder-content">
+                <!-- Subfolder: PRELIM -->
+                <details class="subfolder">
+                    <summary class="subfolder-title">PRELIM</summary>
+                    <div class="subfolder-content">
+                        <!-- Redirect link to the file in the same repository -->
+                        <a href="MQuizTheo1.12.html" class="quiz-link">Theo1.12</a>
+                    </div>
+                </details>
+            </div>
+        </details>
+    </div>
+</div>
+
+</body>
+</html>
