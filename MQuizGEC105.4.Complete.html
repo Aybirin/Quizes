@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media & Digital Communication Platforms Exam Prep</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --correct-bg: rgba(46, 160, 67, 0.15);
+            --correct-border: #2ea043;
+            --correct-text: #3fb950;
+            --wrong-bg: rgba(248, 81, 73, 0.15);
+            --wrong-border: #f85149;
+            --wrong-text: #ff7b72;
+            --analysis-bg: #1c2128;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 25px;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-box {
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .score-box {
+            color: var(--correct-text);
+        }
+
+        .answered-box {
+            color: #58a6ff;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #30363d;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: var(--option-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .option:not(.disabled):hover {
+            background-color: var(--option-hover);
+        }
+
+        .option.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--text-main);
+        }
+
+        .option.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--text-main);
+        }
+
+        .option.disabled {
+            cursor: default;
+        }
+
+        .status-tag {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .status-tag.correct-tag { color: var(--correct-text); }
+        .status-tag.wrong-tag { color: var(--wrong-text); }
+
+        .analysis-box {
+            margin-top: 15px;
+            background-color: var(--analysis-bg);
+            border-radius: 8px;
+            padding: 14px;
+            border-left: 3px solid #58a6ff;
+            display: none;
+        }
+
+        .analysis-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #58a6ff;
+            margin-bottom: 6px;
+        }
+
+        .analysis-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">Social Media & Digital Communication Master Quiz</h1>
+        <div class="stats-bar">
+            <div class="stat-box score-box">Score: <span id="score-counter">0</span> / <span class="total-count">23</span></div>
+            <div class="stat-box answered-box">Answered: <span id="answered-counter">0</span> / <span class="total-count">23</span></div>
+        </div>
+    </div>
+
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+    const keyData = [
+        // Section 1: Social Media in Communication
+        {
+            question: "How is social media specifically defined in the context of communication concepts?",
+            options: [
+                "Web-based applications that promote the creation and exchange of user-generated content.",
+                "Automated hardware frameworks designed primarily for corporate broadcasting.",
+                "Offline software systems used to index external digital media archives.",
+                "Proprietary network algorithms dedicated exclusively to data security and encryption."
+            ],
+            correctIndex: 0,
+            analysis: "According to the course material, social media refers specifically to web-based applications that promote the creation and exchange of user-generated content."
+        },
+        {
+            question: "Within the course material, communication is conceptualized as:",
+            options: [
+                "One of multiple influential interpersonal talents, or how people interact and bond with different people.",
+                "A strictly formal transmission of structured data via encrypted channels.",
+                "A unidirectional push of authoritative marketing information to passive audiences.",
+                "An innate psychological reflex that operates independently of social interaction."
+            ],
+            correctIndex: 0,
+            analysis: "The course framework defines communication as one of multiple influential interpersonal talents, focusing on how individuals interact and bond with others."
+        },
+        {
+            question: "Which collection of functions best captures the overall importance of social media in modern communication?",
+            options: [
+                "Enabling instant, interactive information sharing across distances, building personal connections and communities, supporting business networking, and allowing diverse expression.",
+                "Replacing face-to-face dialogue entirely, automating corporate PR, and standardizing global dialects.",
+                "Serving as an exclusive repository for official government announcements and peer-reviewed journals.",
+                "Restricting public discourse to standardized templates and filtering personal opinion."
+            ],
+            correctIndex: 0,
+            analysis: "Social media's core importance lies in its multifaceted ability to facilitate instant interactive sharing, foster communities, support professional networks, and allow diverse self-expression across distances."
+        },
+        {
+            question: "In what manner does social media enhance interpersonal communication between individuals?",
+            options: [
+                "By facilitating fast communication, allowing people to quickly share messages, exchange ideas, and build mutual understanding and connections.",
+                "By forcing all interactions into standardized, pre-approved textual formats.",
+                "By eliminating the need for clear language through automatic emotional translation.",
+                "By prioritizing passive consumption over reciprocal dialogue."
+            ],
+            correctIndex: 0,
+            analysis: "Social media improves interpersonal communication by accelerating message exchange, encouraging idea sharing, and fostering mutual understanding and personal bonds."
+        },
+        {
+            question: "How does social media contribute to accelerating the speed of information sharing across groups?",
+            options: [
+                "It makes it easier to share knowledge quickly, enabling many people to exchange ideas on diverse topics and collectively generate valuable insights.",
+                "It automatically verifies and publishes raw user data without requiring manual input.",
+                "It centralizes all information dissemination through a single moderated corporate feed.",
+                "It restricts information sharing to small, isolated network clusters."
+            ],
+            correctIndex: 0,
+            analysis: "The rapid speed of information sharing on social media enables large crowds to exchange perspectives on various topics, leading to collective insight generation."
+        },
+        {
+            question: "Which statement reflects how social media functions as a hub for news and current affairs?",
+            options: [
+                "It provides access to diverse information and current events in one place, keeping people updated on global and local happenings while raising awareness on key issues.",
+                "It replaces news outlets by producing all journalistic content through central automated bots.",
+                "It restricts access to news items based strictly on paid subscription tiers.",
+                "It isolates local news feeds from international events to avoid information overload."
+            ],
+            correctIndex: 0,
+            analysis: "Social media aggregates diverse news and current events into a single platform, keeping users informed on both local and international levels while raising awareness on critical issues."
+        },
+        {
+            question: "Beyond personal relationships, how does staying connected with friends and family via social media impact broader society?",
+            options: [
+                "By sharing information, photos, videos, and audio, it strengthens mutual understanding and ultimately contributes to a nation's growth.",
+                "It diverts civic engagement away from economic development towards pure leisure.",
+                "It replaces physical community infrastructure with mandatory virtual interactions.",
+                "It standardizes household communication rules across different cultural demographics."
+            ],
+            correctIndex: 0,
+            analysis: "Sharing media (photos, videos, audio) with close circles strengthens social cohesion and mutual understanding, which foundational course concepts connect to national growth."
+        },
+        {
+            question: "How does social media assist individuals in staying informed on a broader scale?",
+            options: [
+                "By providing people with diverse knowledge through the latest news, views, and opportunities from their own nation and abroad.",
+                "By filtering out global news to highlight only local commercial offers.",
+                "By presenting a single, unified governmental perspective on global events.",
+                "By archiving past historical data while restricting real-time updates."
+            ],
+            correctIndex: 0,
+            analysis: "Staying informed via social media involves gaining broad exposure to diverse insights, current news, and opportunities originating both nationally and internationally."
+        },
+        {
+            question: "In what way does social media usage foster the improvement of communication skills?",
+            options: [
+                "By enabling people and organizations to share ideas, express opinions, and stay aware of various issues.",
+                "By enforcing strict grammatical rules and automated language corrections on posts.",
+                "By eliminating subjective opinions in favor of standardized operational queries.",
+                "By restricting public interaction to non-verbal emoji reactions."
+            ],
+            correctIndex: 0,
+            analysis: "Communication skills are developed on social media through the active exercise of expressing opinions, articulating ideas, and maintaining awareness of social issues."
+        },
+        {
+            question: "What role does social media play in organizational or collective decision-making?",
+            options: [
+                "It allows people to easily share ideas, making their views quickly understood by others and contributing to important decision-making.",
+                "It uses AI algorithms to make final decisions on behalf of community groups.",
+                "It restricts public feedback until after decisions are finalized by executives.",
+                "It eliminates individual opinions in favor of randomized consensus polling."
+            ],
+            correctIndex: 0,
+            analysis: "Social media streamlines decision-making processes by making individual views easily shareable and quickly understandable across group members."
+        },
+        {
+            question: "How does social media facilitate the process of information finding for users?",
+            options: [
+                "It helps people find useful information from various sources, share it widely, and spread knowledge on different topics and opportunities.",
+                "It forces users to rely exclusively on indexed academic libraries.",
+                "It automatically restricts search results to sponsored corporate advertisements.",
+                "It categorizes information strictly by geographic proximity."
+            ],
+            correctIndex: 0,
+            analysis: "Information finding is enhanced as social media allows users to discover facts across multiple sources, redistribute content, and propagate knowledge on opportunities."
+        },
+        {
+            question: "How is the concept of 'freedom of expression' manifest within social media platforms?",
+            options: [
+                "It allows individuals to freely share their thoughts and feelings, giving them a platform to discuss issues and contribute to nation-building.",
+                "It guarantees that all user content is published without any platform moderation or legal oversight.",
+                "It mandates equal reach and engagement metrics for every posted opinion.",
+                "It limits self-expression strictly to political and socio-economic subjects."
+            ],
+            correctIndex: 0,
+            analysis: "Social media supports freedom of expression by providing a open venue for individuals to share personal thoughts, discuss societal issues, and participate in nation-building."
+        },
+
+        // Section 2: Digital Communication Tools and Platforms
+        {
+            question: "What defines digital communication as a broader technological concept?",
+            options: [
+                "The exchange of information and ideas through electronic devices and networks, enabling real-time interaction, instant messaging, video calls, and multimedia sharing.",
+                "The physical distribution of printed media using automated optical scanners.",
+                "Unidirectional transmission of radio signals to non-interactive receiver nodes.",
+                "Local storage of text files on non-networked personal computing devices."
+            ],
+            correctIndex: 0,
+            analysis: "Digital communication encompasses the networked electronic exchange of data, facilitating real-time interactions across various mediums like instant messages, video, and multimedia."
+        },
+        {
+            question: "What key reality regarding digital communication was highlighted by the global pandemic?",
+            options: [
+                "Businesses lacking digital communication struggled to survive, video conferencing became the main communication channel, and email became the standard for message exchange.",
+                "Traditional paper mail briefly replaced digital channels due to network instability.",
+                "Social media usage declined as organizations shifted exclusively to phone landlines.",
+                "Digital communication was proven to be unnecessary for small and medium enterprises."
+            ],
+            correctIndex: 0,
+            analysis: "The pandemic demonstrated that digital communication was critical for organizational survival, elevating video calls to primary channels and solidifying email as standard practice."
+        },
+        {
+            question: "Which cluster of benefits best explains why digital communication is essential in modern settings?",
+            options: [
+                "Better worker engagement, comfortable experience, universal acceptability, organizational transparency, and savings in time, energy, and money.",
+                "Complete elimination of operational costs, absolute privacy, and total automation of labor.",
+                "Guaranteed public consensus, reduction of data storage needs, and removal of corporate hierarchy.",
+                "Standardization of employee working hours across all global time zones."
+            ],
+            correctIndex: 0,
+            analysis: "Digital communication is crucial because it drives worker engagement, convenient usability, widespread adoption, internal transparency, and resource efficiency."
+        },
+        {
+            question: "What primary function do instant messaging platforms like WhatsApp, Facebook Messenger, and Slack serve?",
+            options: [
+                "They enable real-time messaging for fast, efficient communication (including features like custom WhatsApp status updates).",
+                "They serve primarily as long-term cold-storage archives for corporate financial records.",
+                "They replace public search engines by indexing open web data.",
+                "They are designed strictly for asynchronous video broadcast broadcasting."
+            ],
+            correctIndex: 0,
+            analysis: "Instant messaging platforms focus on real-time, low-friction text and media exchanges that maximize speed and operational efficiency for personal and team use."
+        },
+        {
+            question: "How have video conferencing tools such as Google Meet, Zoom, and Microsoft Teams transformed remote interactions?",
+            options: [
+                "By enabling face-to-face interactions and virtual meetings that redefine remote communication.",
+                "By replacing written documentation with automated voice-to-text summaries.",
+                "By eliminating the need for scheduled business meetings entirely.",
+                "By serving exclusively as platforms for streaming large-scale public entertainment."
+            ],
+            correctIndex: 0,
+            analysis: "Video tools bridged geographical barriers by replicating in-person dynamics through face-to-face virtual meetings."
+        },
+        {
+            question: "What is the primary role of general social media platforms like Facebook, Twitter, Instagram, and LinkedIn?",
+            options: [
+                "Connecting people globally while enabling life updates, public discussions, and network building.",
+                "Storing high-security enterprise databases in decentralized clouds.",
+                "Managing internal supply chain logistics for international shipping.",
+                "Providing private, end-to-end encrypted financial transactions."
+            ],
+            correctIndex: 0,
+            analysis: "These social networking channels connect global users, offering avenues for personal status sharing, broader community dialogue, and relationship networking."
+        },
+        {
+            question: "Despite newer communication technologies, email remains critical because it is:",
+            options: [
+                "A widely used, formal, and reliable digital communication method for exchanging messages and official files.",
+                "The fastest medium for real-time informal group chat conversations.",
+                "An anonymous file-sharing system designed to bypass corporate firewalls.",
+                "A system that automatically categorizes all incoming data into legal briefs."
+            ],
+            correctIndex: 0,
+            analysis: "Email maintains its position as the baseline formal standard for structured, reliable, and documentation-friendly digital correspondence."
+        },
+        {
+            question: "What is the key advantage offered by collaborative tools and cloud storage platforms like Google Drive and Dropbox?",
+            options: [
+                "Allowing users to collaborate on documents in real-time, significantly boosting teamwork and productivity.",
+                "Automatically generating written content based on simple user prompts.",
+                "Replacing the need for local hardware operating systems.",
+                "Encrypting files so that only a single user can access them at any given time."
+            ],
+            correctIndex: 0,
+            analysis: "Cloud storage and collaboration systems excel at enabling simultaneous multi-user document editing and file management, enhancing team workflows."
+        },
+        {
+            question: "How can businesses specifically leverage professional social networking platforms like Twitter and LinkedIn?",
+            options: [
+                "For professional networking, knowledge sharing, and industry engagement to build a loyal customer base.",
+                "To conduct internal employee payroll and tax processing.",
+                "To bypass standard regulatory compliance frameworks during marketing.",
+                "To maintain private, unindexed internal corporate records."
+            ],
+            correctIndex: 0,
+            analysis: "LinkedIn and Twitter offer strategic value to businesses by facilitating industry influence, expert content distribution, and targeted customer network growth."
+        },
+        {
+            question: "What primary utility do mobile applications offer within the digital communication ecosystem?",
+            options: [
+                "Enabling communication on the go by providing instant access to messaging, social media, banking, and other services.",
+                "Increasing physical device processing power through network tethering.",
+                "Standardizing user interfaces across different hardware manufacturers.",
+                "Eliminating the requirement for wireless internet or cellular data connections."
+            ],
+            correctIndex: 0,
+            analysis: "Mobile apps deliver portability, allowing continuous access to vital communication, transaction, and social channels regardless of location."
+        },
+        {
+            question: "How do project management software, virtual whiteboards, live chats, and chatbots support modern operations?",
+            options: [
+                "Project management tools and whiteboards facilitate remote team collaboration, while live chat and chatbots provide prompt customer support.",
+                "They fully automate human customer service roles without requiring supervision.",
+                "They replace traditional email systems by converting all communication into project tasks.",
+                "They restrict client interactions exclusively to pre-recorded video responses."
+            ],
+            correctIndex: 0,
+            analysis: "Project management tools and whiteboards streamline internal remote workflows, whereas live chat and automated chatbots address external customer service responsiveness."
+        }
+    ];
+
+    const TOTAL = keyData.length;
+    let score = 0;
+    let answered = 0;
+
+    function shuffle(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function init() {
+        document.querySelectorAll('.total-count').forEach(el => el.textContent = TOTAL);
+        const container = document.getElementById('quiz-container');
+        const shuffledQuestions = shuffle(keyData);
+
+        shuffledQuestions.forEach((q, idx) => {
+            let options = q.options.map((opt, i) => ({ text: opt, correct: i === q.correctIndex }));
+            options = shuffle(options);
+
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-${idx}`;
+
+            const labels = ['A', 'B', 'C', 'D'];
+            let optsHTML = '';
+            options.forEach((opt, cIdx) => {
+                optsHTML += `<div class="option" data-correct="${opt.correct}" onclick="check('q-${idx}', this)">${labels[cIdx]}. ${opt.text}</div>`;
+            });
+
+            card.innerHTML = `
+                <div class="question-text">${idx + 1}. ${q.question}</div>
+                <div class="options-list">${optsHTML}</div>
+                <div class="analysis-box">
+                    <div class="analysis-title">Explanation</div>
+                    <p class="analysis-text">${q.analysis}</p>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function check(cardId, selectedOpt) {
+        const card = document.getElementById(cardId);
+        if (card.getAttribute('data-answered') === 'true') return;
+        card.setAttribute('data-answered', 'true');
+
+        const isCorrect = selectedOpt.getAttribute('data-correct') === 'true';
+        const options = card.querySelectorAll('.option');
+
+        options.forEach(opt => {
+            opt.classList.add('disabled');
+            const optCorrect = opt.getAttribute('data-correct') === 'true';
+            if (opt === selectedOpt) {
+                if (isCorrect) {
+                    opt.classList.add('correct');
+                    opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+                    score++;
+                } else {
+                    opt.classList.add('wrong');
+                    opt.innerHTML += ` <span class="status-tag wrong-tag">✕ Your answer</span>`;
+                }
+            } else if (optCorrect) {
+                opt.classList.add('correct');
+                opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+            }
+        });
+
+        card.querySelector('.analysis-box').style.display = 'block';
+        answered++;
+        document.getElementById('score-counter').textContent = score;
+        document.getElementById('answered-counter').textContent = answered;
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
