@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theology 103: Complete 186-Question Church History Exam Prep</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --correct-bg: rgba(46, 160, 67, 0.15);
+            --correct-border: #2ea043;
+            --correct-text: #3fb950;
+            --wrong-bg: rgba(248, 81, 73, 0.15);
+            --wrong-border: #f85149;
+            --wrong-text: #ff7b72;
+            --analysis-bg: #1c2128;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 25px;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-box {
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .score-box {
+            color: var(--correct-text);
+        }
+
+        .answered-box {
+            color: #58a6ff;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #30363d;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: var(--option-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .option:not(.disabled):hover {
+            background-color: var(--option-hover);
+        }
+
+        .option.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--text-main);
+        }
+
+        .option.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--text-main);
+        }
+
+        .option.disabled {
+            cursor: default;
+        }
+
+        .status-tag {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .status-tag.correct-tag { color: var(--correct-text); }
+        .status-tag.wrong-tag { color: var(--wrong-text); }
+
+        .analysis-box {
+            margin-top: 15px;
+            background-color: var(--analysis-bg);
+            border-radius: 8px;
+            padding: 14px;
+            border-left: 3px solid #58a6ff;
+            display: none;
+        }
+
+        .analysis-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #58a6ff;
+            margin-bottom: 6px;
+        }
+
+        .analysis-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">Theology 103: Complete Church History Master Quiz</h1>
+        <div class="stats-bar">
+            <div class="stat-box score-box">Score: <span id="score-counter">0</span> / <span class="total-count">186</span></div>
+            <div class="stat-box answered-box">Answered: <span id="answered-counter">0</span> / <span class="total-count">186</span></div>
+        </div>
+    </div>
+
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+    const keyData = [
+        // Section 1: Header & Institutional Context (6 facts)
+        {
+            question: "What is the official course code and title for this module?",
+            options: ["Theology 103: Church History", "Theology 101: Biblical Exegesis", "Theology 102: Dogmatic Theology", "Theology 104: Moral Philosophy"],
+            correctIndex: 0,
+            analysis: "The module directly covers Theology 103: Church History."
+        },
+        {
+            question: "What topic is explicitly covered in Lesson 2 of this course?",
+            options: ["The Conversion and Missionary Journeys of Paul & Establishment of Churches", "The Ecumenical Councils and the Early Heresies", "The Protestant Reformation and the Council of Trent", "The Rise of Monasticism in the Middle Ages"],
+            correctIndex: 0,
+            analysis: "Lesson 2 focuses on Paul's conversion, his three missionary journeys, and early church planting."
+        },
+        {
+            question: "Which educational institution provided this course handout?",
+            options: ["St. Anthony's College", "Ateneo de Manila University", "University of Santo Tomas", "De La Salle University"],
+            correctIndex: 0,
+            analysis: "The handout originates from St. Anthony's College."
+        },
+        {
+            question: "In which municipality and province is St. Anthony's College located?",
+            options: ["San Angel, San Jose, Antique", "Jaro, Iloilo City", "Kalibo, Aklan", "Roxas City, Capiz"],
+            correctIndex: 0,
+            analysis: "St. Anthony's College is situated in San Angel, San Jose, Antique."
+        },
+        {
+            question: "What is the target audience and distribution limit for this study guide?",
+            options: ["Exclusively for enrolled students and educational use", "Public domain publication for all institutions", "Commercial resale across bookstores", "Faculty-only research repository"],
+            correctIndex: 0,
+            analysis: "The materials are restricted exclusively for enrolled students and educational purposes."
+        },
+        {
+            question: "What guarantee is made regarding the facts included in this master review guide?",
+            options: ["Zero omission of facts from the course handout", "A 50% summary of core concepts", "Inclusion of external commentary only", "Selective sampling of historical events"],
+            correctIndex: 0,
+            analysis: "This review guide represents a comprehensive compilation with zero facts omitted from the official handout."
+        },
+
+        // Section 2: Conversion of St. Paul (21 facts)
+        {
+            question: "What was Saul's religious identity prior to his conversion?",
+            options: ["A devout Jew", "A Roman pagan priest", "A Samaritan elder", "A Gentile proselyte"],
+            correctIndex: 0,
+            analysis: "Saul was a devout Jew strictly committed to maintaining the Jewish faith."
+        },
+        {
+            question: "Under which famous Pharisee teacher was Saul well-versed in the Jewish Law?",
+            options: ["Gamaliel", "Nicodemus", "Caiaphas", "Hillel"],
+            correctIndex: 0,
+            analysis: "Acts notes that Saul studied under the revered Pharisee teacher Gamaliel."
+        },
+        {
+            question: "Who was Gamaliel in the context of Saul's background?",
+            options: ["A famous Pharisee teacher", "The High Priest of the Jerusalem Temple", "A Roman governor of Judea", "A Hellenistic Jewish philosopher"],
+            correctIndex: 0,
+            analysis: "Gamaliel was a respected and prominent Pharisaic teacher of the Law."
+        },
+        {
+            question: "How did Saul view the Law in relation to God and the Jewish nation?",
+            options: ["As God's sacred covenant with His people", "As an obsolete set of ceremonial rules", "As a political arrangement with Rome", "As a purely symbolic ethical tradition"],
+            correctIndex: 0,
+            analysis: "Saul considered the Mosaic Law to be God's sacred and immutable covenant."
+        },
+        {
+            question: "Why did Saul view the Church's proclamation of Jesus as Messiah so negatively?",
+            options: ["He saw it as a deviation from Jewish expectations", "He believed it encouraged Roman political rule", "He thought it rejected the God of Abraham", "He viewed it as a financial scam"],
+            correctIndex: 0,
+            analysis: "He perceived Jesus' messiaship as contrary to traditional messianic expectations and orthodox Jewish faith."
+        },
+        {
+            question: "What threat did Saul believe early Christianity posed?",
+            options: ["A threat to the integrity of the Jewish faith", "A military danger to the Roman Empire", "A loss of revenue for Gentile merchants", "A breakdown of Greek philosophy"],
+            correctIndex: 0,
+            analysis: "Saul feared the Christian movement would erode the integrity and purity of Judaism."
+        },
+        {
+            question: "In what city did Saul initially initiate active persecution against followers of Christ?",
+            options: ["Jerusalem", "Antioch", "Damascus", "Rome"],
+            correctIndex: 0,
+            analysis: "Saul began his hostile campaign against Christians directly in Jerusalem."
+        },
+        {
+            question: "To which city was Saul traveling to extend his persecution of Christians?",
+            options: ["Damascus", "Tarsus", "Alexandria", "Corinth"],
+            correctIndex: 0,
+            analysis: "Saul obtained authorization to pursue and arrest disciples in Damascus."
+        },
+        {
+            question: "Whom did Saul encounter while traveling on the road to Damascus?",
+            options: ["The risen Jesus", "The Apostle Peter", "An angel of death", "John the Baptist"],
+            correctIndex: 0,
+            analysis: "Saul experienced a transformative vision and encounter with the risen Jesus."
+        },
+        {
+            question: "Which scriptural text records Saul's conversion on the Damascus road?",
+            options: ["Acts 9:1–19", "Acts 2:1–13", "Romans 1:1–12", "Galatians 3:1–9"],
+            correctIndex: 0,
+            analysis: "The primary historical account of Saul's encounter is recorded in Acts 9:1–19."
+        },
+        {
+            question: "What physical condition affected Saul immediately following his encounter with Jesus?",
+            options: ["Blindness", "Paralysis", "Deafness", "Muteness"],
+            correctIndex: 0,
+            analysis: "A blinding light left Saul unable to see for three days."
+        },
+        {
+            question: "Besides physical blindness, what emotional/mental state described Saul after the vision?",
+            options: ["He was deeply troubled", "He was furious and hostile", "He was joyous and loud", "He was completely unconcerned"],
+            correctIndex: 0,
+            analysis: "The intense encounter left Saul shaken, praying, and deeply troubled in spirit."
+        },
+        {
+            question: "Who was Ananias of Damascus?",
+            options: ["A disciple of Christ in Damascus", "A Roman magistrate", "A priest from the Temple in Jerusalem", "A Pharisee sent to arrest Saul"],
+            correctIndex: 0,
+            analysis: "Ananias was a faithful Christian disciple residing in Damascus."
+        },
+        {
+            question: "Why did Ananias decide to visit Saul despite Saul's terrifying reputation?",
+            options: ["He received a vision from the Lord", "He was ordered by the Roman governor", "He wanted to confront Saul publicly", "Peter requested him to do so"],
+            correctIndex: 0,
+            analysis: "The Lord appeared to Ananias in a vision commanding him to seek out Saul."
+        },
+        {
+            question: "What divine title did the Lord use to describe Saul to Ananias in Acts 9:15?",
+            options: ["A chosen instrument", "A faithful prophet", "A royal priest", "A holy judge"],
+            correctIndex: 0,
+            analysis: "God declared: 'This man is my chosen instrument to carry my name...'"
+        },
+        {
+            question: "According to Acts 9:15, to which three groups was Saul chosen to bring God's name?",
+            options: ["Gentiles, kings, and the people of Israel", "Pharisees, Sadducees, and Romans", "Greeks, Scythians, and Samaritans", "Priests, Levites, and tax collectors"],
+            correctIndex: 0,
+            analysis: "Saul's divine mandate explicitly encompassed Gentiles, royalty/kings, and Israel."
+        },
+        {
+            question: "What two spiritual/physical actions did Ananias perform when meeting Saul?",
+            options: ["Laid hands to restore sight and fill him with the Holy Spirit", "Anointed him with oil and gave him a new cloak", "Gave him bread and baptized him in the river", "Exorcised a demon and pronounced a blessing"],
+            correctIndex: 0,
+            analysis: "Ananias laid hands on Saul, restoring his eyesight and mediating the Holy Spirit (Acts 9:17)."
+        },
+        {
+            question: "What miraculous physical recovery occurred after Ananias prayed for Saul?",
+            options: ["His sight was miraculously restored", "His paralyzed legs were healed", "His speech obstacle disappeared", "His physical strength doubled"],
+            correctIndex: 0,
+            analysis: "Scales fell from Saul's eyes, immediately restoring his sight."
+        },
+        {
+            question: "What sacraments/spiritual milestones immediately followed Saul's healing?",
+            options: ["He was baptized and filled with the Holy Spirit", "He was ordained an elder and consecrated", "He took a vow of poverty and fasted for forty days", "He received Holy Communion from Peter"],
+            correctIndex: 0,
+            analysis: "Saul immediately submitted to Christian baptism and received the Holy Spirit."
+        },
+        {
+            question: "What did Saul begin declaring in the Damascus synagogues immediately after his conversion?",
+            options: ["Jesus is the Son of God", "The Mosaic Law is abolished", "Rome will soon fall", "Gentiles must keep circumcision"],
+            correctIndex: 0,
+            analysis: "Acts 9:20 records that Saul at once proclaimed in the synagogues: 'Jesus is the Son of God.'"
+        },
+        {
+            question: "By what Roman name did Saul eventually become known during his global ministry?",
+            options: ["Paul", "Silas", "Luke", "Titus"],
+            correctIndex: 0,
+            analysis: "As his mission expanded into the Greco-Roman world, Saul used his Roman name, Paul."
+        },
+        {
+            question: "What role did Paul ultimately achieve within early Church history?",
+            options: ["One of the Church's greatest evangelizers", "The first High Priest of Jerusalem", "The original author of the Old Testament", "The military leader of Jewish Christians"],
+            correctIndex: 0,
+            analysis: "Paul is universally recognized as one of the dynamic founding evangelizers of early Christianity."
+        },
+        {
+            question: "How extensive was Paul's geographic range in spreading the Gospel?",
+            options: ["He traveled extensively across the Roman world", "He remained strictly within Palestine", "He traveled primarily to India and Persia", "He restricted his journeys to Egypt"],
+            correctIndex: 0,
+            analysis: "Paul covered thousands of miles throughout major provinces of the Roman Empire."
+        },
+        {
+            question: "On which date does the liturgical calendar celebrate the Feast of the Conversion of St. Paul?",
+            options: ["January 25", "June 29", "August 15", "November 1"],
+            correctIndex: 0,
+            analysis: "The Feast of the Conversion of St. Paul is observed annually on January 25."
+        },
+
+        // Section 3: Overview of Paul's Ministry & Early Travels (20 facts)
+        {
+            question: "What foundational academic background equipped Paul for theological debates?",
+            options: ["He was highly educated in Jewish Law", "He was trained as a Roman centurion", "He studied Greek sculpture in Athens", "He was a former Temple tax collector"],
+            correctIndex: 0,
+            analysis: "Paul had rigorous Pharisaic education and deep legal-theological training."
+        },
+        {
+            question: "What was Paul's level of familiarity with Jewish Sacred Scripture?",
+            options: ["He possessed deep knowledge of Sacred Scripture", "He had only basic oral familiarity", "He relied entirely on Greek translations without study", "He rejected scriptural study"],
+            correctIndex: 0,
+            analysis: "Paul possessed exhaustive knowledge of the Hebrew scriptures and traditions."
+        },
+        {
+            question: "What title is uniquely given to Paul to highlight his specific divine commission?",
+            options: ["Apostle of the Gentiles", "Apostle of the Circumcision", "Bishop of Jerusalem", "Patriarch of Antioch"],
+            correctIndex: 0,
+            analysis: "Paul is uniquely honored as the 'Apostle of the Gentiles'."
+        },
+        {
+            question: "Approximately how many total miles did Paul travel over the course of his missionary work?",
+            options: ["More than 10,000 miles", "Under 1,000 miles", "Roughly 3,000 miles", "Over 50,000 miles"],
+            correctIndex: 0,
+            analysis: "Historians estimate Paul logged well over 10,000 miles across land and sea."
+        },
+        {
+            question: "What is the minimum number of local churches Paul established during his ministry?",
+            options: ["At least 14 churches", "Exactly 3 churches", "Over 100 churches", "Only 1 church in Rome"],
+            correctIndex: 0,
+            analysis: "Historical records show Paul directly founded or established at least 14 Christian communities."
+        },
+        {
+            question: "In which modern regions/countries were Paul's established churches located?",
+            options: ["Greece, Turkey, Syria, and ancient regions now absent from maps", "Italy, Spain, and France", "Egypt, Ethiopia, and Libya", "Persia, Iraq, and Armenia"],
+            correctIndex: 0,
+            analysis: "Paul's churches spanned the areas of modern Greece, Turkey, Syria, and historic Mediterranean territories."
+        },
+        {
+            question: "How many explicit missionary journeys are systematically recorded in the Book of Acts?",
+            options: ["3 separate missionary journeys", "1 long journey", "5 structured journeys", "7 distinct journeys"],
+            correctIndex: 0,
+            analysis: "Acts explicitly details three organized missionary journeys led by Paul."
+        },
+        {
+            question: "Why do some biblical scholars argue for a 4th missionary journey?",
+            options: ["Based on post-Acts New Testament references", "Based on Roman government tax logs", "Based on newly discovered papyri in Egypt", "Based on early apocryphal gospels"],
+            correctIndex: 0,
+            analysis: "References in Pastoral Epistles (Tit/Tim) suggest travel to Spain or Crete after his initial Roman imprisonment."
+        },
+        {
+            question: "To whom were Paul's pastoral epistles primarily addressed?",
+            options: ["To those exact local church communities he founded/visited", "To Roman emperors and governors", "To non-believing Greek philosophers", "To the Jewish Sanhedrin in Jerusalem"],
+            correctIndex: 0,
+            analysis: "Paul wrote letters directly to churches and leaders (e.g., Corinth, Galatia, Timothy) under his care."
+        },
+        {
+            question: "What threat did Paul face immediately after preaching in the Damascus synagogues?",
+            options: ["Threats from Jewish opponents", "Arrest by Roman soldiers", "Banishment by the governor", "Rejection by local Gentiles"],
+            correctIndex: 0,
+            analysis: "Acts 9:20–22 notes that hostile Jewish factions plotted against Paul for preaching Christ."
+        },
+        {
+            question: "Where did Paul withdraw for quiet reflection and preparation after leaving Damascus?",
+            options: ["Arabia", "Rome", "Athens", "Alexandria"],
+            correctIndex: 0,
+            analysis: "Galatians 1:17 states that Paul spent time in Arabia following his conversion."
+        },
+        {
+            question: "What does historical scholarship note regarding the precise boundaries of Paul's 'Arabia'?",
+            options: ["The exact location of Arabia is uncertain", "It was definitively modern Saudi Arabia", "It referred exclusively to the Sinai Peninsula", "It was a small suburb of Damascus"],
+            correctIndex: 0,
+            analysis: "The term 'Arabia' in the 1st century referred broadly to the Nabataean realm, making the exact spot uncertain."
+        },
+        {
+            question: "How did Paul escape the murder plot upon returning to Damascus?",
+            options: ["Lowered in a basket over the city wall", "Disguised as a Roman soldier", "Hidden inside a commercial grain cart", "Escorted out by guards at midnight"],
+            correctIndex: 0,
+            analysis: "Disciples assisted Paul by letting him down through an opening in the city wall using a basket."
+        },
+        {
+            question: "Which key leaders did Paul meet during his initial visit to Jerusalem after converting?",
+            options: ["Peter and James", "John and Thomas", "Andrew and Philip", "Matthew and Barnabas"],
+            correctIndex: 0,
+            analysis: "Galatians 1:18 specifies that Paul visited Cephas (Peter) and saw James, the Lord's brother."
+        },
+        {
+            question: "How did the Jerusalem Christians initially react to Paul's presence?",
+            options: ["They initially feared Paul", "They welcomed him with a lavish feast", "They appointed him head of the council", "They ignored him entirely"],
+            correctIndex: 0,
+            analysis: "Remembering his ruthless past, believers were terrified and skeptical of his conversion."
+        },
+        {
+            question: "Which group fiercely opposed Paul when he preached boldly in Jerusalem?",
+            options: ["Hellenistic Jews", "Roman centurions", "Samaritan priests", "Sadducee judges"],
+            correctIndex: 0,
+            analysis: "Paul debated with Hellenistic (Greek-speaking) Jews, who ultimately sought to kill him (Acts 9:29)."
+        },
+        {
+            question: "To which region was Paul sent to ensure his safety from Jerusalem hostile groups?",
+            options: ["His home region of Tarsus in Cilicia", "The island of Crete", "The city of Rome", "The province of Galatia"],
+            correctIndex: 0,
+            analysis: "Brethren sent Paul away to Tarsus in Cilicia for his protection (Acts 9:30)."
+        },
+        {
+            question: "What activity did Paul most likely engage in during his quiet years in Tarsus?",
+            options: ["Continued local evangelism", "Retired from public life", "Worked as a Roman court clerk", "Studied Greek medicine"],
+            correctIndex: 0,
+            analysis: "Paul spent several years in Tarsus likely laying groundwork through localized preaching."
+        },
+        {
+            question: "Who traveled to Tarsus to bring Paul to Antioch, Syria?",
+            options: ["Barnabas", "Peter", "Silas", "John Mark"],
+            correctIndex: 0,
+            analysis: "Barnabas journeyed to Tarsus specifically to recruit Paul for the expanding Antioch ministry."
+        },
+        {
+            question: "What major historical designation occurred for the first time in Antioch, Syria?",
+            options: ["Disciples were first called 'Christians'", "The New Testament was canonized", "The first church building was constructed", "Gentiles were forbidden from worship"],
+            correctIndex: 0,
+            analysis: "Acts 11:26 notes: 'The disciples were called Christians first in Antioch.'"
+        },
+
+        // Section 4: Paul's First Missionary Journey (39 facts)
+        {
+            question: "Why were there two cities named Antioch in ancient regional geography?",
+            options: ["Both were named after Antiochus, father of Seleucid I", "They were named after a famous Roman emperor", "Antioch means 'Holy City' in Greek", "They were named by Alexander the Great"],
+            correctIndex: 0,
+            analysis: "Seleucus I Nicator founded both cities, naming them in honor of his father, Antiochus."
+        },
+        {
+            question: "What was the administrative/demographic rank of Antioch in Syria within the Roman Empire?",
+            options: ["3rd largest city in ancient Rome", "1st largest city in ancient Rome", "Small rural trading outpost", "Capital city of the whole empire"],
+            correctIndex: 0,
+            analysis: "Syrian Antioch was a major metropolis, ranking third in size and influence after Rome and Alexandria."
+        },
+        {
+            question: "Antioch in Syria served as the provincial capital of which Roman territory?",
+            options: ["Roman province of Syria", "Roman province of Asia", "Roman province of Achaia", "Roman province of Galatia"],
+            correctIndex: 0,
+            analysis: "It served as the official administrative capital of the Roman province of Syria."
+        },
+        {
+            question: "In which modern nation is the ancient city of Syrian Antioch located today?",
+            options: ["Modern southern Turkey", "Modern Syria", "Modern Israel", "Modern Greece"],
+            correctIndex: 0,
+            analysis: "The site of ancient Syrian Antioch lies within the borders of modern-day Antakya, Turkey."
+        },
+        {
+            question: "How were Paul and Barnabas selected for their first missionary voyage in Acts 13?",
+            options: ["The Holy Spirit singled them out", "They were elected by popular vote", "Roman officials assigned them", "They volunteered without consult"],
+            correctIndex: 0,
+            analysis: "Acts 13:2 records: 'The Holy Spirit said, Set apart for me Barnabas and Saul...'"
+        },
+        {
+            question: "In what ancient region was Pisidian Antioch located?",
+            options: ["Ancient region of Pisidia", "Island of Cyprus", "Region of Macedonia", "Coast of Pamphylia"],
+            correctIndex: 0,
+            analysis: "Pisidian Antioch sat inland in the mountainous district of Pisidia."
+        },
+        {
+            question: "In which modern country is the ancient region of Pisidia located?",
+            options: ["Modern Turkey", "Modern Greece", "Modern Italy", "Modern Lebanon"],
+            correctIndex: 0,
+            analysis: "Like Syrian Antioch, Pisidian Antioch's ruins lie inside modern-day Turkey."
+        },
+        {
+            question: "What is the geographic identity and location of Cyprus?",
+            options: ["A Mediterranean island south of Syria", "A mountain range in Greece", "A coastal town in Egypt", "An island in the Black Sea"],
+            correctIndex: 0,
+            analysis: "Cyprus is a prominent island located in the eastern Mediterranean Sea."
+        },
+        {
+            question: "At which port city in Cyprus did Paul and Barnabas land first?",
+            options: ["Salamis", "Paphos", "Attalia", "Troas"],
+            correctIndex: 0,
+            analysis: "Upon reaching Cyprus, they disembarked and began preaching at Salamis."
+        },
+        {
+            question: "Who accompanied Paul and Barnabas to assist in sharing the gospel at Salamis?",
+            options: ["John Mark", "Silas", "Timothy", "Luke"],
+            correctIndex: 0,
+            analysis: "John Mark was with them as their helper during the early Cyprus leg."
+        },
+        {
+            question: "What family relation existed between John Mark and Barnabas?",
+            options: ["John Mark was possibly Barnabas' cousin", "John Mark was Barnabas' son", "John Mark was Barnabas' brother", "John Mark was Barnabas' uncle"],
+            correctIndex: 0,
+            analysis: "Colossians 4:10 notes that Mark was the cousin of Barnabas."
+        },
+        {
+            question: "What sorcerer did Paul and Barnabas encounter in Paphos?",
+            options: ["Elymas", "Simon Magus", "Sceva", "Demas"],
+            correctIndex: 0,
+            analysis: "In Paphos, they confronted a Jewish magician and false prophet named Elymas."
+        },
+        {
+            question: "What was the alternative Jewish name for Elymas the sorcerer?",
+            options: ["Bar-Jesus", "Bar-Jona", "Bar-Timaeus", "Barnabas"],
+            correctIndex: 0,
+            analysis: "Acts 13:6 explicitly states his Jewish name was Bar-Jesus."
+        },
+        {
+            question: "Which high-ranking Roman official employed or kept Elymas in his court?",
+            options: ["Governor Sergius Paulus", "Proconsul Gallio", "Governor Felix", "Governor Festus"],
+            correctIndex: 0,
+            analysis: "Elymas was attached to the retinue of the Roman proconsul, Sergius Paulus."
+        },
+        {
+            question: "What was Governor Sergius Paulus' desire regarding Paul and Barnabas?",
+            options: ["He wanted to hear God's word", "He intended to execute them", "He sought to collect taxes from them", "He wanted them to leave Cyprus"],
+            correctIndex: 0,
+            analysis: "Sergius Paulus, an intelligent man, summoned them because he wished to hear the word of God."
+        },
+        {
+            question: "How did Elymas react to Paul's preaching before Sergius Paulus?",
+            options: ["He opposed Paul and Barnabas", "He immediately converted", "He fled the city", "He offered them money"],
+            correctIndex: 0,
+            analysis: "Elymas actively withstood them, seeking to turn the proconsul away from the faith."
+        },
+        {
+            question: "What harsh reprimand did Paul deliver to Elymas?",
+            options: ["Called him a 'child of the devil'", "Called him a hypocrite", "Called him a Roman spy", "Called him an ignorant fool"],
+            correctIndex: 0,
+            analysis: "Paul sternly addressed him as a 'child of the devil' and enemy of righteousness."
+        },
+        {
+            question: "What miraculous judgment befell Elymas through Paul?",
+            options: ["Paul struck Elymas blind", "Elymas was struck mute", "Elymas collapsed dead", "Elymas became paralyzed"],
+            correctIndex: 0,
+            analysis: "A mist and darkness fell upon Elymas, leaving him blind and seeking someone to lead him."
+        },
+        {
+            question: "How did Governor Sergius Paulus react to the blinding of Elymas?",
+            options: ["He believed", "He had Paul arrested", "He banished all Christians", "He remained indifferent"],
+            correctIndex: 0,
+            analysis: "Seeing what had happened, the governor believed, astonished at the teaching of the Lord."
+        },
+        {
+            question: "What irony exists in the story of Elymas and Sergius Paulus?",
+            options: ["Elymas became the vehicle God used to draw Sergius to Him", "Elymas eventually wrote a Gospel", "Sergius Paulus executed Elymas later", "Paul was blinded instead"],
+            correctIndex: 0,
+            analysis: "Irony lies in the fact that Elymas' opposition directly displayed God's power, leading Sergius to faith."
+        },
+        {
+            question: "Where is the region of Pamphylia situated geographically?",
+            options: ["Modern-day Turkey", "Modern-day Greece", "Modern-day Italy", "Modern-day Egypt"],
+            correctIndex: 0,
+            analysis: "Pamphylia was a coastal region located along southern Asia Minor (modern Turkey)."
+        },
+        {
+            question: "What significant setback occurred when the missionary party reached Perga in Pamphylia?",
+            options: ["John Mark left the group and returned to Jerusalem", "Paul was shipwrecked", "Barnabas fell ill with malaria", "They were imprisoned by Roman guards"],
+            correctIndex: 0,
+            analysis: "At Perga, John Mark abruptly departed from Paul and Barnabas to return home."
+        },
+        {
+            question: "In what direction was Jerusalem relative to where the missionary team was heading?",
+            options: ["In the opposite direction from where they were traveling", "Directly along their forward route", "To the north across the mountains", "Westward across the sea"],
+            correctIndex: 0,
+            analysis: "Mark turned back southeast toward Jerusalem, abandoning the onward trek northward."
+        },
+        {
+            question: "What long-term relational consequence resulted from John Mark's departure at Perga?",
+            options: ["It created a rift between Paul and Barnabas", "It caused Barnabas to quit ministry", "It led to Paul's arrest", "It destroyed the Antioch church"],
+            correctIndex: 0,
+            analysis: "This abandonment became the exact source of contention prior to the second trip."
+        },
+        {
+            question: "What opportunity were Paul and Barnabas given in the synagogue at Pisidian Antioch?",
+            options: ["Local synagogue leaders invited them to speak", "They were put on trial immediately", "They were forced to read the Torah in Hebrew", "They were barred from entering"],
+            correctIndex: 0,
+            analysis: "After scripture readings, rulers of the synagogue invited them to offer a word of exhortation."
+        },
+        {
+            question: "How did the local population react one week after Paul's initial preaching in Pisidian Antioch?",
+            options: ["Almost the entire city gathered to hear", "The synagogue was completely empty", "A riot broke out immediately", "The Roman governor banned meetings"],
+            correctIndex: 0,
+            analysis: "The following Sabbath, almost the whole city assembled to hear the word of God."
+        },
+        {
+            question: "Why did certain Jewish leaders oppose Paul in Pisidian Antioch?",
+            options: ["They became jealous and resisted", "They disagreed with his Greek grammar", "They thought Paul was a Roman spy", "They wanted money from Paul"],
+            correctIndex: 0,
+            analysis: "Seeing the huge crowds, hostile leaders were filled with jealousy and reviled Paul."
+        },
+        {
+            question: "What crucial strategic shift did Paul and Barnabas announce in response to Jewish resistance?",
+            options: ["Pivoted to preaching directly to the Gentiles", "Decided to end their missionary work", "Returned immediately to Jerusalem", "Focused solely on political leaders"],
+            correctIndex: 0,
+            analysis: "Paul declared: 'Since you reject it... we now turn to the Gentiles.'"
+        },
+        {
+            question: "How did hostile opponents drive Paul and Barnabas out of Pisidian Antioch?",
+            options: ["Incited God-fearing women of high standing and leading men", "Hired Roman gladiators to attack them", "Imprisoned them for six months", "Burned down their lodging"],
+            correctIndex: 0,
+            analysis: "Opponents incited influential women and city leaders to expel them from the district."
+        },
+        {
+            question: "Where was the city of Iconium located in ancient geography?",
+            options: ["In Phrygia (modern Turkish city of Konya)", "On the island of Crete", "In central Macedonia", "Near the coast of Syria"],
+            correctIndex: 0,
+            analysis: "Iconium was situated in Phrygia/Lycaonia, known today as Konya, Turkey."
+        },
+        {
+            question: "What success did Paul and Barnabas experience in the Iconium synagogue?",
+            options: ["A great number of both Jews and Greeks accepted the gospel", "Only one person believed", "No one attended the service", "The synagogue leaders converted instantly"],
+            correctIndex: 0,
+            analysis: "Acts 14:1 notes that a great multitude of both Jews and Greeks believed."
+        },
+        {
+            question: "What divine confirmation accompanied Paul and Barnabas' preaching in Iconium?",
+            options: ["The Lord enabled them to perform signs and wonders", "An earthquake shook the city", "Fire came down from heaven", "Angels appeared publicly"],
+            correctIndex: 0,
+            analysis: "Acts 14:3 confirms God bore witness by granting signs and wonders to be done by their hands."
+        },
+        {
+            question: "Why did Paul and Barnabas flee Iconium for Lystra and Derbe?",
+            options: ["Learned of a plot to abuse and stone them", "A severe famine broke out", "They received an urgent letter from Peter", "The winter season made travel hard"],
+            correctIndex: 0,
+            analysis: "Discovering an active conspiracy among Gentiles and Jews to stone them, they fled."
+        },
+        {
+            question: "What miracle took place in Lystra through Paul?",
+            options: ["He healed a man lame from birth", "He raised a dead child", "He restored sight to a blind woman", "He calmed a violent storm"],
+            correctIndex: 0,
+            analysis: "Paul commanded a man crippled from birth to stand up, and he was completely healed."
+        },
+        {
+            question: "How did the pagan crowd in Lystra mistakenly identify Paul and Barnabas?",
+            options: ["As gods in human form (Barnabas as Zeus, Paul as Hermes)", "As Roman emperors", "As Egyptian sorcerers", "As Jewish kings"],
+            correctIndex: 0,
+            analysis: "The crowd shouted that gods had come down, calling Barnabas Zeus and Paul Hermes."
+        },
+        {
+            question: "What action did the priest of Zeus attempt to perform for Paul and Barnabas?",
+            options: ["Brought bulls and wreaths to offer sacrifices", "Offered them gold crowns", "Built a temple for them", "Gave them royal robes"],
+            correctIndex: 0,
+            analysis: "The priest of Zeus brought oxen and garlands to the city gates to offer sacrifice."
+        },
+        {
+            question: "How did Paul and Barnabas react to the crowd attempting to worship them?",
+            options: ["Struggled to restrain them, redirecting praise to the living God", "Accepted the honor graciously", "Fled without speaking", "Demanded money instead"],
+            correctIndex: 0,
+            analysis: "Tearing their clothes, they rushed into the crowd urging them to turn from idols to the living God."
+        },
+        {
+            question: "What violent turn of events occurred when enemies from Antioch and Iconium arrived at Lystra?",
+            options: ["Riled up the crowd and stoned Paul", "Burned down Paul's house", "Had Paul arrested by Roman guards", "Exiled Barnabas to an island"],
+            correctIndex: 0,
+            analysis: "Hostile Jews persuaded the crowd; they stoned Paul and dragged him out of the city."
+        },
+        {
+            question: "What state was Paul in when dragged outside the city of Lystra?",
+            options: ["He was assumed to be dead", "He was lightly injured", "He was unconscious but unblemished", "He was marching boldly"],
+            correctIndex: 0,
+            analysis: "The angry mob dragged Paul out of Lystra, supposing he was dead."
+        },
+        {
+            question: "What astonishing event happened after disciples gathered around Paul's body?",
+            options: ["Paul got up and walked right back into Lystra", "He was carried to a hospital in Derbe", "He lay unconscious for three days", "An angel carried him away"],
+            correctIndex: 0,
+            analysis: "Miraculously, as disciples stood around him, Paul rose up and re-entered the city."
+        },
+        {
+            question: "What was the outcome of preaching in Derbe?",
+            options: ["Preached and won a large number of disciples", "Faced another violent stoning plot", "Were ignored by all citizens", "Were arrested immediately"],
+            correctIndex: 0,
+            analysis: "In Derbe, they preached the gospel and won many disciples without violent resistance."
+        },
+        {
+            question: "What route did Paul and Barnabas take on their return journey back to Syrian Antioch?",
+            options: ["Retraced steps through Lystra, Iconium, and Pisidian Antioch to strengthen believers", "Sailed directly from Derbe to Rome", "Traveled north through Galatia", "Marched through the desert to Egypt"],
+            correctIndex: 0,
+            analysis: "They bravely revisited Lystra, Iconium, and Antioch, strengthening and organizing the young churches."
+        },
+        {
+            question: "What brief stop did they make at Attalia on the return leg?",
+            options: ["Stopped briefly in Attalia where a community was presumably established", "Built a large cathedral", "Fought against Roman soldiers", "Remained for two years"],
+            correctIndex: 0,
+            analysis: "They preached in Perga and went down to Attalia before sailing."
+        },
+        {
+            question: "What island did they bypass on their direct voyage home to Syrian Antioch?",
+            options: ["Skipped Cyprus and sailed straight back", "Skipped Crete", "Skipped Sicily", "Skipped Rhodes"],
+            correctIndex: 0,
+            analysis: "Instead of stopping at Cyprus again, they sailed directly from Attalia to Syrian Antioch."
+        },
+
+        // Section 5: Paul's Second Missionary Journey (44 facts)
+        {
+            question: "Which scriptural passage documents Paul's second missionary journey?",
+            options: ["Acts 15:36–18:22", "Acts 1:1–8:4", "Acts 20:1–28:31", "Romans 8:1–39"],
+            correctIndex: 0,
+            analysis: "Acts 15:36 through 18:22 details the extensive second missionary trip."
+        },
+        {
+            question: "What was the initial primary goal of the second missionary journey?",
+            options: ["Revisit and strengthen churches from the first trip and share Council decrees", "Explore brand new uncharted territories in Western Europe", "Escape persecution in Jerusalem", "Collect money for the Roman Emperor"],
+            correctIndex: 0,
+            analysis: "Paul suggested returning to visit brothers in every city where they had preached."
+        },
+        {
+            question: "What caused the 'sharp disagreement' between Paul and Barnabas prior to departure?",
+            options: ["Disagreement over whether to take John Mark again", "Disagreement over financial compensation", "Disagreement over which route to sail", "Disagreement over theological doctrines"],
+            correctIndex: 0,
+            analysis: "Barnabas wanted to take John Mark, but Paul refused due to Mark's previous desertion."
+        },
+        {
+            question: "Where did Barnabas go after parting ways with Paul?",
+            options: ["Took John Mark and sailed to Cyprus", "Returned home to Tarsus", "Traveled straight to Rome", "Remained permanently in Jerusalem"],
+            correctIndex: 0,
+            analysis: "Barnabas took Mark and sailed to his home island of Cyprus."
+        },
+        {
+            question: "Whom did Paul choose as his main companion for the second journey, and where did they travel?",
+            options: ["Took Silas and traveled through Syria and Cilicia", "Took Luke and sailed to Crete", "Took Peter and went to Galatia", "Took Titus and traveled to Egypt"],
+            correctIndex: 0,
+            analysis: "Paul chose Silas, departing with the church's blessing through Syria and Cilicia."
+        },
+        {
+            question: "Whom did Paul recruit as a young disciple in Derbe and Lystra?",
+            options: ["Timothy, who was half-Greek", "Titus, who was a Roman officer", "Apollos, who was an Alexandrian orator", "Epaphroditus, who was a soldier"],
+            correctIndex: 0,
+            analysis: "At Lystra, Paul met Timothy, son of a Jewish mother and Greek father."
+        },
+        {
+            question: "Why did Paul circumcise Timothy despite the Jerusalem Council's ruling?",
+            options: ["To facilitate ministry due to local Jewish awareness of Timothy's Greek father", "Because circumcision was required for all Christians", "To satisfy Roman law", "Because Timothy requested it for health reasons"],
+            correctIndex: 0,
+            analysis: "To avoid creating unnecessary obstacles among local Jews who knew Timothy's father was Greek."
+        },
+        {
+            question: "Did Paul circumcise Timothy to enforce Mosaic salvation or for missionary expediency?",
+            options: ["He did this for ministry expediency despite the Jerusalem decree", "He did it because he believed Mosaic law was strictly binding", "He did it under compulsion from Peter", "He did it to fulfill a personal vow"],
+            correctIndex: 0,
+            analysis: "It was a strategic pastoral decision for evangelism, not a theological requirement for salvation."
+        },
+        {
+            question: "What divine restraint did Paul and his companions experience in the province of Asia?",
+            options: ["They were kept by the Holy Spirit from preaching in Asia", "They were arrested by Roman officials", "A storm prevented their ship from landing", "They fell ill with fever"],
+            correctIndex: 0,
+            analysis: "Acts 16:6 explicitly notes they were forbidden by the Holy Spirit to speak the word in Asia."
+        },
+        {
+            question: "Which regions did they travel through after being prevented from speaking in Asia?",
+            options: ["Phrygia and Galatia", "Crete and Sicily", "Egypt and Cyrene", "Spain and Gaul"],
+            correctIndex: 0,
+            analysis: "They passed through the Phrygian and Galatian region."
+        },
+        {
+            question: "How did Paul view visiting Iconium again on this second trip?",
+            options: ["He kept Iconium in mind despite past stoning plots", "He avoided Iconium entirely out of fear", "He asked Roman guards to clear Iconium first", "He bypassed it to save time"],
+            correctIndex: 0,
+            analysis: "Paul courageously revisited the region to strengthen believers despite past violence."
+        },
+        {
+            question: "Why was the Epistle to the Galatians later written by Paul?",
+            options: ["Because of pressure on them to observe Mosaic circumcision for salvation", "To thank them for a large financial gift", "To address a dispute over church leadership", "To explain the resurrection of the dead"],
+            correctIndex: 0,
+            analysis: "Galatians was written to combat Judaizers pushing circumcision as necessary for salvation."
+        },
+        {
+            question: "Which border regions did they reach prior to seeking entry into Bithynia?",
+            options: ["Mysia and Troas", "Cyprus and Pamphylia", "Achaia and Corinth", "Syria and Phoenicia"],
+            correctIndex: 0,
+            analysis: "Coming to Mysia, they attempted to go into Bithynia."
+        },
+        {
+            question: "What happened when Paul attempted to enter Bithynia (Acts 16:7)?",
+            options: ["The Spirit of Jesus did not allow them", "A wall blocked their passage", "The local king welcomed them", "They ran out of provisions"],
+            correctIndex: 0,
+            analysis: "Acts 16:7 records that 'the Spirit of Jesus would not allow them.'"
+        },
+        {
+            question: "What divine vision did Paul receive while staying at Troas?",
+            options: ["A vision of a Macedonian man begging 'Come over to Macedonia and help us'", "A vision of an angel standing in Rome", "A vision of Christ ascending into heaven", "A vision of the Temple in Jerusalem"],
+            correctIndex: 0,
+            analysis: "Paul saw a man of Macedonia standing and pleading for help, directing his course into Europe."
+        },
+        {
+            question: "What literary shift occurs in Acts 16:10 at Troas?",
+            options: ["First use of 'we', showing Luke joined the trip in Troas", "Shift from prose to apocalyptic poetry", "Shift from Greek to Aramaic language", "First use of formal legal titles"],
+            correctIndex: 0,
+            analysis: "The narrative changes from 'they' to 'we', indicating the author Luke joined Paul's team at Troas."
+        },
+        {
+            question: "Where did the team make a brief island pit stop while sailing from Troas?",
+            options: ["Samothrace island", "Patmos island", "Malta island", "Cyprus island"],
+            correctIndex: 0,
+            analysis: "Acts 16:11 records they ran a straight course to Samothrace."
+        },
+        {
+            question: "At which port city did they land before proceeding to Philippi?",
+            options: ["Neapolis", "Cenchreae", "Attalia", "Paphos"],
+            correctIndex: 0,
+            analysis: "From Samothrace they traveled to Neapolis, and from there to Philippi."
+        },
+        {
+            question: "Where did Paul go on the Sabbath day to preach in Philippi?",
+            options: ["To women gathered outside the city gate by the river", "To the main Roman forum", "To the local Jewish synagogue building", "To the governor's palace"],
+            correctIndex: 0,
+            analysis: "Lacking a synagogue, they went outside the city gate to the river where people gathered for prayer."
+        },
+        {
+            question: "Who was Lydia of Philippi, and how did she respond to the Gospel?",
+            options: ["A wealthy purple cloth dealer who was baptized with her household and hosted them", "A Roman guard who freed Paul", "A local priestess who converted", "A slave girl who ran away"],
+            correctIndex: 0,
+            analysis: "Lydia, a dealer in purple cloth, opened her heart, was baptized, and welcomed them into her home."
+        },
+        {
+            question: "What deliverance miracle did Paul perform in Philippi?",
+            options: ["Cast out a python spirit from a fortune-telling slave girl", "Healed a blind beggar in the market", "Raised a drowned boy from the river", "Cured the governor's son"],
+            correctIndex: 0,
+            analysis: "Paul commanded a spirit of divination (python spirit) to leave a slave girl."
+        },
+        {
+            question: "What had the slave girl been shouting continuously behind Paul and his team?",
+            options: ["'These men are servants of the Most High God...'", "'These men are Roman traitors!'", "'Do not listen to these Jews!'", "'Worship the true gods of Rome!'"],
+            correctIndex: 0,
+            analysis: "She kept crying out: 'These men are servants of the Most High God, who proclaim to you the way of salvation.'"
+        },
+        {
+            question: "Why did the slave girl's owners become enraged and seize Paul and Silas?",
+            options: ["They lost their source of financial profit from her fortune-telling", "They were devout believers in Roman gods", "Paul refused to pay them money", "Silas broke city property"],
+            correctIndex: 0,
+            analysis: "Realizing their hope of profit was gone, her masters seized Paul and Silas."
+        },
+        {
+            question: "What false charge did the owners bring against Paul and Silas before the magistrates?",
+            options: ["Claimed they were Jews throwing the city into uproar by advocating illegal Roman practices", "Accused them of stealing from the temple", "Accused them of murder", "Accused them of refusing to pay taxes"],
+            correctIndex: 0,
+            analysis: "They claimed these Jews were advocating customs unlawful for Romans to accept or practice."
+        },
+        {
+            question: "What punishment was inflicted on Paul and Silas in Philippi?",
+            options: ["Severely flogged and thrown into prison", "Fined 1,000 denarii and released", "Banished from the province immediately", "Sentenced to fight wild beasts"],
+            correctIndex: 0,
+            analysis: "The magistrates had them stripped, beaten with rods, and severely jailed."
+        },
+        {
+            question: "What miraculous event occurred at midnight while Paul and Silas were singing hymns in prison?",
+            options: ["A severe earthquake shook the foundation, opening doors and freeing chains", "An angel appeared and carried them out invisible", "The prison guards fell into a deep trance", "The jailer gave them keys to leave"],
+            correctIndex: 0,
+            analysis: "A sudden violent earthquake shook the prison, opening all doors and unfastening all chains."
+        },
+        {
+            question: "Why did Paul stop the Philippian jailer from taking his own life?",
+            options: ["Stopped him by shouting that all prisoners were still present", "Dismarmed him physically", "Promised him money", "Told him the governor pardoned everyone"],
+            correctIndex: 0,
+            analysis: "Seeing the doors open, the jailer drew his sword, but Paul shouted: 'Do not harm yourself; we are all here!'"
+        },
+        {
+            question: "What immediate transformation occurred for the Philippian jailer and his family?",
+            options: ["The jailer and his household were baptized after hearing the word", "The jailer resigned his post and fled", "He hid Paul in his attic from authorities", "He escorted Paul to Rome"],
+            correctIndex: 0,
+            analysis: "The jailer washed their wounds, heard the Gospel, and was baptized immediately with his household."
+        },
+        {
+            question: "Why were the Philippian magistrates terrified the next morning?",
+            options: ["Paul revealed his Roman citizenship", "The governor threatened to fire them", "The earthquake destroyed their homes", "The Emperor ordered Paul's release"],
+            correctIndex: 0,
+            analysis: "Learning Paul and Silas were Roman citizens who had been beaten uncondemned, the magistrates panicked."
+        },
+        {
+            question: "Where did Paul and Silas go immediately after being escorted out of the prison?",
+            options: ["Returned to Lydia's house to encourage believers before leaving", "Fled straight to Athens", "Went to the Roman forum to demand money", "Hid in the mountains"],
+            correctIndex: 0,
+            analysis: "They visited Lydia's house, saw and encouraged the brothers, and then departed."
+        },
+        {
+            question: "Which two Macedonian cities did Paul pass through on his way to Thessalonica?",
+            options: ["Amphipolis and Apollonia", "Derbe and Lystra", "Athens and Corinth", "Troas and Neapolis"],
+            correctIndex: 0,
+            analysis: "Acts 17:1 notes they traveled through Amphipolis and Apollonia to Thessalonica."
+        },
+        {
+            question: "How long did Paul preach in the synagogue at Thessalonica?",
+            options: ["3 Sabbath weeks", "6 months", "2 full years", "Only 1 day"],
+            correctIndex: 0,
+            analysis: "Paul reasoned with them from the Scriptures on three consecutive Sabbath days."
+        },
+        {
+            question: "Why did Paul and Silas have to leave Thessalonica hurriedly at night?",
+            options: ["Opponents raised an uproar and attacked Jason's house", "The city caught fire", "The Roman governor ordered their execution", "A famine hit the city"],
+            correctIndex: 0,
+            analysis: "Jealous opponents formed a mob, dragged Jason before officials, forcing believers to send Paul away by night."
+        },
+        {
+            question: "Why were the Jews of Berea praised as noble in Acts 17:11?",
+            options: ["They eagerly examined Scriptures daily to verify Paul's teaching", "They gave large sums of money", "They built a huge synagogue", "They protected Paul with weapons"],
+            correctIndex: 0,
+            analysis: "They received the word with eagerness and examined the Scriptures daily to see if these things were true."
+        },
+        {
+            question: "How was the work in Berea disrupted?",
+            options: ["Opponents from Thessalonica came to Berea to stir up trouble", "Roman soldiers raided the town", "An earthquake destroyed the synagogue", "A severe plague broke out"],
+            correctIndex: 0,
+            analysis: "When Thessalonian Jews learned Paul was in Berea, they came there too, agitating the crowds."
+        },
+        {
+            question: "Who remained behind in Berea when Paul was escorted to safety in Athens?",
+            options: ["Silas and Timothy stayed in Berea", "Luke and Barnabas stayed", "Peter and John stayed", "Lydia and Mark stayed"],
+            correctIndex: 0,
+            analysis: "Silas and Timothy remained in Berea while brothers escorted Paul to the coast and on to Athens."
+        },
+        {
+            question: "In which ancient province was the city of Athens situated?",
+            options: ["Achaia (modern Greece)", "Galatia", "Asia Minor", "Macedonia"],
+            correctIndex: 0,
+            analysis: "Athens was located in the province of Achaia in southern Greece."
+        },
+        {
+            question: "What was Paul waiting for while in Athens?",
+            options: ["Waiting for Silas and Timothy to rejoin him", "Waiting for a ship to Rome", "Waiting for financial supplies", "Waiting for a trial date"],
+            correctIndex: 0,
+            analysis: "Paul sent instructions for Silas and Timothy to join him in Athens as soon as possible."
+        },
+        {
+            question: "What distressed Paul deeply as he walked around Athens?",
+            options: ["Athens was full of idols", "The city was impoverished", "The citizens refused to speak Greek", "The roads were destroyed"],
+            correctIndex: 0,
+            analysis: "His spirit was provoked within him as he saw that the city was full of idols."
+        },
+        {
+            question: "With whom did Paul debate in the Athenian marketplace and Areopagus?",
+            options: ["Epicurean and Stoic philosophers", "Roman legionnaires", "Egyptian traders", "Jewish high priests"],
+            correctIndex: 0,
+            analysis: "Paul engaged daily with synagogue attendees and Epicurean and Stoic philosophers."
+        },
+        {
+            question: "What local inscription did Paul use as a theological bridge during his Areopagus speech?",
+            options: ["An altar dedicated 'To an unknown god'", "A statue of Zeus", "A temple to Caesar", "A legal inscription on the city wall"],
+            correctIndex: 0,
+            analysis: "Paul noted: 'I found an altar with this inscription: TO AN UNKNOWN GOD.'"
+        },
+        {
+            question: "How did Paul connect with the Athenian audience during his sermon?",
+            options: ["Quoted Greek poets and proclaimed the resurrected God", "Condemned all Greek art as evil", "Demanded they observe Jewish dietary laws", "Spoke strictly in Aramaic"],
+            correctIndex: 0,
+            analysis: "Paul quoted Greek poets (e.g., Aratus) to introduce God as Creator and Judge through resurrection."
+        },
+        {
+            question: "How long did Paul reside and minister in the city of Corinth?",
+            options: ["1.5 years (18 months)", "3 months", "5 years", "2 weeks"],
+            correctIndex: 0,
+            analysis: "Acts 18:11 records that Paul stayed in Corinth for a year and six months."
+        },
+        {
+            question: "Who were Priscilla and Aquila, and what trade did they share with Paul?",
+            options: ["Jewish tentmakers with whom Paul lived and worked", "Roman governors who protected Paul", "Greek philosophers who converted", "Merchants who funded Paul's ship"],
+            correctIndex: 0,
+            analysis: "Aquila and Priscilla were tentmakers; Paul joined them in trade and ministry."
+        },
+        {
+            question: "On what day of the week did Paul regularly preach in Corinth?",
+            options: ["Preached weekly on the Sabbath", "Preached every Sunday evening", "Preached only on feast days", "Preached every Wednesday"],
+            correctIndex: 0,
+            analysis: "He reasoned in the synagogue every Sabbath, trying to persuade Jews and Greeks."
+        },
+        {
+            question: "Who rejoined Paul while he was working in Corinth?",
+            options: ["Silas and Timothy rejoined him", "Barnabas and Mark rejoined him", "Peter and Luke rejoined him", "James and Jude rejoined him"],
+            correctIndex: 0,
+            analysis: "When Silas and Timothy arrived from Macedonia, Paul devoted himself fully to preaching."
+        },
+        {
+            question: "What action did Paul take when faced with fierce Jewish blasphemy and opposition in Corinth?",
+            options: ["Shook out his clothes and declared he would turn to the Gentiles", "Returned to Jerusalem immediately", "Appealed to the Roman Emperor", "Stopped preaching altogether"],
+            correctIndex: 0,
+            analysis: "Paul shook out his garments and said, 'Your blood be on your own heads! I will go to the Gentiles.'"
+        },
+        {
+            question: "How did Roman Proconsul Gallio respond when Jewish opponents brought Paul to court in Corinth?",
+            options: ["Dismissed the case as a Jewish internal matter", "Sentenced Paul to flogging", "Imprisoned Paul for two years", "Ordered the destruction of the synagogue"],
+            correctIndex: 0,
+            analysis: "Gallio refused to judge Jewish religious disputes and drove them from the tribunal."
+        },
+        {
+            question: "What vow-related action did Paul perform at the port of Cenchreae?",
+            options: ["Had his hair cut because of a vow", "Baptized ten sailors", "Burned his old garments", "Fasteth for forty days"],
+            correctIndex: 0,
+            analysis: "At Cenchreae he had his hair cut, for he was under a Nazirite-style vow."
+        },
+        {
+            question: "What route did Paul take to conclude his second journey?",
+            options: ["Sailed to Ephesus, left Priscilla/Aquila there, sailed to Caesarea, and visited Jerusalem", "Sailed directly from Corinth to Rome", "Marched overland through Asia Minor", "Sailed to Alexandria, Egypt"],
+            correctIndex: 0,
+            analysis: "Paul visited Ephesus briefy, landed at Caesarea, went up to salute the Jerusalem church, and returned to Antioch."
+        },
+
+        // Section 6: Paul's Third Missionary Journey & Death (26 facts)
+        {
+            question: "Where did Paul's third missionary journey begin, and where did he first travel?",
+            options: ["Began in Jerusalem/Antioch, traveling inland through Galatia and Phrygia", "Began in Rome, sailing to Spain", "Began in Athens, sailing to Crete", "Began in Alexandria, traveling to Petra"],
+            correctIndex: 0,
+            analysis: "After spending time in Antioch, Paul set out through Galatia and Phrygia."
+        },
+        {
+            question: "Which towns did Paul revisit in Galatia/Phrygia during the early part of his third trip?",
+            options: ["Derbe, Lystra, and Iconium", "Philippi, Thessalonica, and Berea", "Athens, Corinth, and Cenchreae", "Salamis, Paphos, and Perga"],
+            correctIndex: 0,
+            analysis: "Paul traveled systematically through the Galatian region strengthening all the disciples."
+        },
+        {
+            question: "What was the administrative status of Ephesus in Asia Minor?",
+            options: ["Capital city of the Roman province of Asia", "A minor fishing village", "A military fortress in the mountains", "An independent Greek city-state"],
+            correctIndex: 0,
+            analysis: "Ephesus was the major commercial hub and capital of the province of Asia."
+        },
+        {
+            question: "Who was Apollos, and what missing element existed in his early preaching at Ephesus?",
+            options: ["An eloquent orator who knew Jesus accurately but only knew John's baptism", "A Roman priest who rejected the Old Testament", "A Pharisee who opposed Gentile converts", "A physician who accompanied Luke"],
+            correctIndex: 0,
+            analysis: "Apollos preached boldly about Jesus but knew only the baptism of John until Aquila and Priscilla instructed him."
+        },
+        {
+            question: "What essential distinction did Paul teach the Ephesian disciples in Acts 19?",
+            options: ["Difference between John's water baptism of repentance and baptism in Jesus' name/Holy Spirit", "Difference between circumcision and dietary laws", "Difference between Roman law and Greek law", "Difference between fasting and feasting"],
+            correctIndex: 0,
+            analysis: "Paul explained John's baptism was of repentance, leading them to be baptized in the name of the Lord Jesus and receive the Holy Spirit."
+        },
+        {
+            question: "Where did Paul teach daily in Ephesus after leaving the synagogue?",
+            options: ["Lecture hall of Tyrannus for 2 years", "The temple of Artemis", "The public Roman bathhouse", "On the roof of Aquila's home"],
+            correctIndex: 0,
+            analysis: "After synagogue resistance, Paul withdrew to hold daily discussions in the lecture hall of Tyrannus for two years."
+        },
+        {
+            question: "What unusual miracles occurred through objects touched by Paul in Ephesus?",
+            options: ["Handkerchiefs or aprons touched by him healed sick and cast out spirits", "Shadow cast by Paul raised the dead", "His staff turned into a living vine", "Water touched by him turned into wine"],
+            correctIndex: 0,
+            analysis: "God did extraordinary miracles through Paul; handkerchiefs or aprons that touched him brought healing."
+        },
+        {
+            question: "Who were the Seven Sons of Sceva in Acts 19?",
+            options: ["Sons of a Jewish chief priest who tried exorcising spirits using Jesus' name unlawfully", "Seven Roman soldiers who converted in Ephesus", "Seven elders appointed to lead the Ephesian church", "Seven silversmiths who rioted"],
+            correctIndex: 0,
+            analysis: "They were itinerant Jewish exorcists who tried invoking 'Jesus whom Paul preaches' over demoniacs."
+        },
+        {
+            question: "How did an evil spirit respond to the Seven Sons of Sceva?",
+            options: ["'Jesus I know, and Paul I know about, but who are you?' and attacked them", "The spirit submitted immediately and fled", "The spirit spoke in Latin praising Caesar", "The spirit blinded the seven sons"],
+            correctIndex: 0,
+            analysis: "The evil spirit mocked them, overpowered them, and drove them out of the house naked and wounded."
+        },
+        {
+            question: "What massive public action took place in Ephesus after the incident with Sceva's sons?",
+            options: ["Sorcerers burned magic books worth 50,000 drachmas", "The town clerk banished all Jews", "The temple of Artemis was closed", "Paul was crowned king of Ephesus"],
+            correctIndex: 0,
+            analysis: "Believers brought their magic scrolls and burned them publicly; the value totaled 50,000 silver coins (130 years of wages)."
+        },
+        {
+            question: "Who was Demetrius, and why did he oppose Paul in Ephesus?",
+            options: ["A silversmith making Artemis shrines whose business suffered as idol demand dropped", "A Roman governor who wanted to tax Christians", "A synagogue ruler jealous of Paul", "A philosopher who lost a debate"],
+            correctIndex: 0,
+            analysis: "Demetrius made silver shrines of Artemis; Paul's preaching against man-made gods threatened his profits."
+        },
+        {
+            question: "What resulted from Demetrius' speech to the craftsmen of Ephesus?",
+            options: ["A massive citywide uproar and riot in the great theater", "A peaceful debate in the forum", "Demetrius was arrested by Romans", "The silversmiths converted"],
+            correctIndex: 0,
+            analysis: "The entire city was filled with confusion; they rushed into the theater shouting 'Great is Artemis of the Ephesians!'"
+        },
+        {
+            question: "How were Paul's companions protected during the Ephesian theater riot?",
+            options: ["Disciples and friendly local officials stopped Paul from entering the dangerous crowd", "Roman legions fired arrows at the crowd", "An earthquake dispersed the crowd", "They hid inside a secret tunnel"],
+            correctIndex: 0,
+            analysis: "Paul wanted to appear before the crowd, but the disciples and Asian officials (Asiarchs) begged him not to venture in."
+        },
+        {
+            question: "Who finally quieted and dismissed the enraged Ephesian mob?",
+            options: ["The city clerk warned them of Roman charges for rioting", "The Roman governor arrived with troops", "Peter arrived from Jerusalem", "Demetrius apologized to the crowd"],
+            correctIndex: 0,
+            analysis: "The city clerk quieted the crowd, reminding them that disorderly gatherings risked Roman charges of rioting."
+        },
+        {
+            question: "How long did Paul stay in Greece (Achaia/Corinth) during his third trip?",
+            options: ["3 months", "2 years", "1 week", "10 years"],
+            correctIndex: 0,
+            analysis: "Acts 20:2–3 states Paul arrived in Greece and stayed there for three months."
+        },
+        {
+            question: "Why did Paul alter his return travel route from Greece back toward Syria?",
+            options: ["An opposition plot forced him to return overland via Macedonia", "A sudden sea storm destroyed all ships", "He received an urgent message from Galatia", "The Roman Emperor closed the ports"],
+            correctIndex: 0,
+            analysis: "Because Jews made a plot against him as he was about to sail for Syria, he decided to return through Macedonia."
+        },
+        {
+            question: "Where did Paul reunite with Luke and his travel companions after sailing from Philippi?",
+            options: ["Troas", "Ephesus", "Rhodes", "Cyprus"],
+            correctIndex: 0,
+            analysis: "Paul sailed from Philippi after the Feast of Unleavened Bread and joined the team at Troas."
+        },
+        {
+            question: "How long did Paul stay in Troas during this visit?",
+            options: ["7 days", "1 month", "3 years", "1 day"],
+            correctIndex: 0,
+            analysis: "Acts 20:6 notes that Paul and his party stayed in Troas for seven days."
+        },
+        {
+            question: "What dramatic incident happened to young Eutychus during Paul's late-night sermon in Troas?",
+            options: ["Fell asleep in a 3rd-story window and fell to his death", "Fell into the harbor and nearly drowned", "Was bitten by a poisonous viper", "Was arrested by Roman guards"],
+            correctIndex: 0,
+            analysis: "As Paul spoke on until midnight, Eutychus sank into a deep sleep and fell from the third story, picked up dead."
+        },
+        {
+            question: "How did Paul respond to Eutychus' fatal fall?",
+            options: ["Embraced him, restored his life, and continued preaching until dawn", "Conducted a funeral service immediately", "Sent for a local doctor", "Blamed the young man for falling asleep"],
+            correctIndex: 0,
+            analysis: "Paul fell on him, embraced him, saying 'Do not be alarmed, his life is in him,' and raised him alive."
+        },
+        {
+            question: "What land travel did Paul complete between Troas and Assos?",
+            options: ["Paul walked overland to Assos while others sailed", "Paul rode a royal chariot", "Paul was carried on a stretcher", "Paul took a fast horse sprint"],
+            correctIndex: 0,
+            analysis: "Acts 20:13 states Paul decided to go by foot overland to Assos."
+        },
+        {
+            question: "Why did Paul choose to bypass Ephesus on his journey back toward Jerusalem?",
+            options: ["He wanted to reach Jerusalem in time for Pentecost without delay", "He was banned by the Ephesian governor", "He feared another silversmith riot", "The Ephesian church was closed"],
+            correctIndex: 0,
+            analysis: "He had decided to sail past Ephesus to avoid spending time in Asia, hurrying for Pentecost."
+        },
+        {
+            question: "Where did Paul summon the Ephesian church elders for a final farewell address?",
+            options: ["Miletus", "Assos", "Patara", "Tyre"],
+            correctIndex: 0,
+            analysis: "From Miletus, Paul sent to Ephesus and called the elders of the church to meet him."
+        },
+        {
+            question: "What unrecorded saying of Jesus did Paul quote to the Ephesian elders in Acts 20:35?",
+            options: ["'It is more blessed to give than to receive'", "'Blessed are the poor in spirit'", "'Love your enemies'", "'I am the way, the truth, and the life'"],
+            correctIndex: 0,
+            analysis: "Paul quoted Jesus' non-gospel recorded words: 'It is more blessed to give than to receive.'"
+        },
+        {
+            question: "What prophetic warning did the prophet Agabus give to Paul at Caesarea?",
+            options: ["Bound his own hands/feet with Paul's belt, predicting Paul's arrest in Jerusalem", "Warned Paul that his ship would sink", "Predicted a severe drought in Rome", "Told Paul he would be crowned king"],
+            correctIndex: 0,
+            analysis: "Agabus took Paul's belt, bound his own feet and hands, declaring the owner would be bound by Jews in Jerusalem."
+        },
+        {
+            question: "According to Church tradition, how and when was St. Paul martyred in Rome?",
+            options: ["Beheaded under Emperor Nero after the Great Fire of Rome in 64 CE", "Crucified upside down under Emperor Domitian", "Thrown to lions in the Colosseum", "Stoned to death in Jerusalem"],
+            correctIndex: 0,
+            analysis: "Tradition holds that Paul, as a Roman citizen, was beheaded outside Rome under Nero around 64–67 AD."
+        },
+
+        // Section 7: The Council of Jerusalem (10 facts)
+        {
+            question: "What core theological question prompted the convening of the Council of Jerusalem?",
+            options: ["Whether Gentile converts must undergo circumcision and full Mosaic Law compliance", "Which books belong in the Old Testament canon", "The exact date of Easter celebration", "Whether bishops can marry"],
+            correctIndex: 0,
+            analysis: "The dispute centered on whether Gentile Christians had to be circumcised and keep Mosaic law to be saved."
+        },
+        {
+            question: "Who were the 'Judaizers', and what was their insistence in Acts 15?",
+            options: ["Jewish Christians insisting Gentiles must observe Mosaic Law for salvation", "Roman priests trying to convert Christians", "Greek scholars denying the resurrection", "Jewish leaders attempting to rebuild the Temple"],
+            correctIndex: 0,
+            analysis: "Judaizers argued: 'Unless you are circumcised according to the custom of Moses, you cannot be saved.'"
+        },
+        {
+            question: "What position did Paul and Barnabas advocate at the Jerusalem Council?",
+            options: ["Argued no Mosaic ceremonial obligations should be placed on Gentile converts", "Supported full mandatory circumcision for all Gentiles", "Suggested Gentiles form a completely separate church", "Proposed keeping dietary laws but dropping circumcision"],
+            correctIndex: 0,
+            analysis: "Paul and Barnabas argued passionately that salvation is by grace through faith, without Mosaic legal burdens."
+        },
+        {
+            question: "In approximately what year did the Council of Jerusalem take place?",
+            options: ["c. 49–50 AD", "c. 33 AD", "c. 70 AD", "c. 313 AD"],
+            correctIndex: 0,
+            analysis: "Historians date the Jerusalem Council to around 49 or 50 AD."
+        },
+        {
+            question: "What crucial role did St. Peter play during the Council's deliberations?",
+            options: ["Spoke as leader of the universal Church, settling the core principle", "Remained silent throughout the debate", "Voted in favor of mandatory circumcision", "Acted as court reporter taking notes"],
+            correctIndex: 0,
+            analysis: "Peter stood up as head of the apostles, declaring God made no distinction between Jew and Gentile, saving all by grace."
+        },
+        {
+            question: "What role did St. James play at the Council of Jerusalem?",
+            options: ["Served as Bishop of Jerusalem and supported Peter's decision with pastoral decrees", "Opposed Peter's decision openly", "Demanded Paul be expelled", "Wrote the Gospel of Matthew"],
+            correctIndex: 0,
+            analysis: "James, leader of the Jerusalem church, affirmed Peter's decision and proposed the practical pastoral pastoral terms."
+        },
+        {
+            question: "What three specific prohibitions were placed on Gentile converts by the Council decree?",
+            options: ["Avoid food sacrificed to idols, blood/strangled meat, and sexual immorality", "Avoid reading Greek philosophy, eating pork, and working on Sabbath", "Avoid serving in the Roman army, paying taxes, and wearing wool", "Avoid wine, marriage, and financial profit"],
+            correctIndex: 0,
+            analysis: "The council restricted: food polluted by idols, sexual immorality, meat of strangled animals, and blood."
+        },
+        {
+            question: "What global impact did the Jerusalem Council's decree have on the early Church?",
+            options: ["Approved the Gentile mission and affirmed the universal (catholic) nature of the Church", "Split the Church into two separate religions", "Restricted Christianity exclusively to Jewish converts", "Caused Rome to declare war on Christians"],
+            correctIndex: 0,
+            analysis: "By removing Mosaic cultural barriers, the Council officially opened faith in Christ universally to all nations."
+        },
+        {
+            question: "What 4-step synodal authority pattern was established by the Jerusalem Council?",
+            options: ["Recognize Issue, Gather Leaders, Deliberate, and Issue Formal Announcement", "Elect Leader, Cast Lots, Fast, Write Book", "Debate Publicly, Excommunicate Opponents, Appeal to Caesar, Enforce", "Pray, Vote, Dismiss, Re-convene"],
+            correctIndex: 0,
+            analysis: "The Council set the standard model for Church synods: problem identification, gathering, guided debate, and authoritative decree."
+        },
+        {
+            question: "What distinct theological formula was used in issuing the Council's final decree (Acts 15:28)?",
+            options: ["'It is the decision of the Holy Spirit and of us...'", "'By order of the Emperor and the Senate...'", "'According to the ancient custom of Moses...'", "'By unanimous human vote...'"],
+            correctIndex: 0,
+            analysis: "The apostolic letter declared: 'It seemed good to the Holy Spirit and to us to lay upon you no greater burden...'"
+        },
+
+        // Section 8: Separation from Judaism & Preserving Tradition (6 facts)
+        {
+            question: "How did Jesus' personal practice align with Judaism, and what final mandate did He give?",
+            options: ["Lived as a Jew keeping the Torah, but gave the Great Commission to make disciples of all nations", "Rejected Jewish traditions completely and preached Greek philosophy", "Ordered his followers to destroy the Temple", "Forbidden his apostles from preaching to Gentiles"],
+            correctIndex: 0,
+            analysis: "Jesus practiced Jewish faith perfectly while establishing the new covenant mission to embrace all nations (Matt 28:19–20)."
+        },
+        {
+            question: "What factor severely strained relations between the Church and orthodox Judaism over three decades?",
+            options: ["Three decades of persistent persecution by Jewish authorities", "Christian involvement in Roman politics", "Disputes over trade routes in Galilee", "The translation of the Torah into Latin"],
+            correctIndex: 0,
+            analysis: "Ongoing theological conflict and intense persecution of Christians by Jewish leaders severed historical ties."
+        },
+        {
+            question: "What major martyrdom occurred in Jerusalem in 62 AD?",
+            options: ["James (Bishop of Jerusalem) was arrested by the High Priest for alleged blasphemy and executed", "Peter was crucified in Jerusalem", "Paul was stoned in the Temple court", "Stephen was arrested by Roman guards"],
+            correctIndex: 0,
+            analysis: "In 62 AD, the High Priest Ananus had James, the brother of the Lord and head of the Jerusalem church, executed."
+        },
+        {
+            question: "What was St. Peter's geographical ministry progression ending in Rome?",
+            options: ["Moved from Jerusalem to Antioch, and finally to Rome as Bishop of Rome for over 20 years", "Remained in Jerusalem until his death", "Traveled from Alexandria to Carthage", "Lived permanently in Ephesus"],
+            correctIndex: 0,
+            analysis: "Peter led the Jerusalem church, ministered in Antioch, and ultimately led the Church in Rome until martyrdom under Nero."
+        },
+        {
+            question: "Where was St. Peter buried following his martyrdom?",
+            options: ["Buried on Vatican Hill in a pagan cemetery, site of St. Peter's Basilica", "Buried in the Catacombs of St. Callixtus", "Buried in the Mount of Olives in Jerusalem", "Buried at sea off the coast of Italy"],
+            correctIndex: 0,
+            analysis: "Peter was crucified near Nero's circus and buried on Vatican Hill, where Constantine later erected the basilica."
+        },
+        {
+            question: "How was the sacred Deposit of Faith preserved and passed down in the early Church?",
+            options: ["Preserved orally, summarized in texts like the Didache, and passed down through Apostolic Succession (bishops)", "Kept in secret vaults in Alexandria", "Recorded exclusively in private Roman imperial records", "Lost until rediscovery in the 16th century"],
+            correctIndex: 0,
+            analysis: "The apostolic teaching was handed on orally and in writing, guarded by continuous episcopal succession."
+        }
+    ];
+
+    const TOTAL = keyData.length;
+    let score = 0;
+    let answered = 0;
+
+    function shuffle(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function init() {
+        document.querySelectorAll('.total-count').forEach(el => el.textContent = TOTAL);
+        const container = document.getElementById('quiz-container');
+        const shuffledQuestions = shuffle(keyData);
+
+        shuffledQuestions.forEach((q, idx) => {
+            let options = q.options.map((opt, i) => ({ text: opt, correct: i === q.correctIndex }));
+            options = shuffle(options);
+
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-${idx}`;
+
+            const labels = ['A', 'B', 'C', 'D'];
+            let optsHTML = '';
+            options.forEach((opt, cIdx) => {
+                optsHTML += `<div class="option" data-correct="${opt.correct}" onclick="check('q-${idx}', this)">${labels[cIdx]}. ${opt.text}</div>`;
+            });
+
+            card.innerHTML = `
+                <div class="question-text">${idx + 1}. ${q.question}</div>
+                <div class="options-list">${optsHTML}</div>
+                <div class="analysis-box">
+                    <div class="analysis-title">Explanation</div>
+                    <p class="analysis-text">${q.analysis}</p>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function check(cardId, selectedOpt) {
+        const card = document.getElementById(cardId);
+        if (card.getAttribute('data-answered') === 'true') return;
+        card.setAttribute('data-answered', 'true');
+
+        const isCorrect = selectedOpt.getAttribute('data-correct') === 'true';
+        const options = card.querySelectorAll('.option');
+
+        options.forEach(opt => {
+            opt.classList.add('disabled');
+            const optCorrect = opt.getAttribute('data-correct') === 'true';
+            if (opt === selectedOpt) {
+                if (isCorrect) {
+                    opt.classList.add('correct');
+                    opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+                    score++;
+                } else {
+                    opt.classList.add('wrong');
+                    opt.innerHTML += ` <span class="status-tag wrong-tag">✕ Your answer</span>`;
+                }
+            } else if (optCorrect) {
+                opt.classList.add('correct');
+                opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+            }
+        });
+
+        card.querySelector('.analysis-box').style.display = 'block';
+        answered++;
+        document.getElementById('score-counter').textContent = score;
+        document.getElementById('answered-counter').textContent = answered;
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>

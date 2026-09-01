@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Church History Master Quiz</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --correct-bg: rgba(46, 160, 67, 0.15);
+            --correct-border: #2ea043;
+            --correct-text: #3fb950;
+            --wrong-bg: rgba(248, 81, 73, 0.15);
+            --wrong-border: #f85149;
+            --wrong-text: #ff7b72;
+            --analysis-bg: #1c2128;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 25px;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-box {
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .score-box {
+            color: var(--correct-text);
+        }
+
+        .answered-box {
+            color: #58a6ff;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #30363d;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: var(--option-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .option:not(.disabled):hover {
+            background-color: var(--option-hover);
+        }
+
+        .option.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--text-main);
+        }
+
+        .option.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--text-main);
+        }
+
+        .option.disabled {
+            cursor: default;
+        }
+
+        .status-tag {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .status-tag.correct-tag { color: var(--correct-text); }
+        .status-tag.wrong-tag { color: var(--wrong-text); }
+
+        .analysis-box {
+            margin-top: 15px;
+            background-color: var(--analysis-bg);
+            border-radius: 8px;
+            padding: 14px;
+            border-left: 3px solid #58a6ff;
+            display: none;
+        }
+
+        .analysis-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #58a6ff;
+            margin-bottom: 6px;
+        }
+
+        .analysis-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">Core Church History Master Quiz</h1>
+        <div class="stats-bar">
+            <div class="stat-box score-box">Score: <span id="score-counter">0</span> / <span class="total-count">25</span></div>
+            <div class="stat-box answered-box">Answered: <span id="answered-counter">0</span> / <span class="total-count">25</span></div>
+        </div>
+    </div>
+
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+    const keyData = [
+        {
+            question: "Under which famous Pharisee teacher was Saul well-versed in the Jewish Law?",
+            options: ["Gamaliel", "Nicodemus", "Caiaphas", "Hillel"],
+            correctIndex: 0,
+            analysis: "Acts notes that Saul studied under the revered Pharisee teacher Gamaliel."
+        },
+        {
+            question: "Whom did Saul encounter while traveling on the road to Damascus?",
+            options: ["The risen Jesus", "The Apostle Peter", "An angel of death", "John the Baptist"],
+            correctIndex: 0,
+            analysis: "Saul experienced a transformative vision and encounter with the risen Jesus."
+        },
+        {
+            question: "What physical condition affected Saul immediately following his encounter with Jesus?",
+            options: ["Blindness", "Paralysis", "Deafness", "Muteness"],
+            correctIndex: 0,
+            analysis: "A blinding light left Saul unable to see for three days."
+        },
+        {
+            question: "According to Acts 9:15, to which three groups was Saul chosen to bring God's name?",
+            options: ["Gentiles, kings, and the people of Israel", "Pharisees, Sadducees, and Romans", "Greeks, Scythians, and Samaritans", "Priests, Levites, and tax collectors"],
+            correctIndex: 0,
+            analysis: "Saul's divine mandate explicitly encompassed Gentiles, royalty/kings, and Israel."
+        },
+        {
+            question: "What title is uniquely given to Paul to highlight his specific divine commission?",
+            options: ["Apostle of the Gentiles", "Apostle of the Circumcision", "Bishop of Jerusalem", "Patriarch of Antioch"],
+            correctIndex: 0,
+            analysis: "Paul is uniquely honored as the 'Apostle of the Gentiles'."
+        },
+        {
+            question: "How many explicit missionary journeys are systematically recorded in the Book of Acts?",
+            options: ["3 separate missionary journeys", "1 long journey", "5 structured journeys", "7 distinct journeys"],
+            correctIndex: 0,
+            analysis: "Acts explicitly details three organized missionary journeys led by Paul."
+        },
+        {
+            question: "What major historical designation occurred for the first time in Antioch, Syria?",
+            options: ["Disciples were first called 'Christians'", "The New Testament was canonized", "The first church building was constructed", "Gentiles were forbidden from worship"],
+            correctIndex: 0,
+            analysis: "Acts 11:26 notes: 'The disciples were called Christians first in Antioch.'"
+        },
+        {
+            question: "How were Paul and Barnabas selected for their first missionary voyage in Acts 13?",
+            options: ["The Holy Spirit singled them out", "They were elected by popular vote", "Roman officials assigned them", "They volunteered without consult"],
+            correctIndex: 0,
+            analysis: "Acts 13:2 records: 'The Holy Spirit said, Set apart for me Barnabas and Saul...'"
+        },
+        {
+            question: "What miraculous judgment befell Elymas the sorcerer through Paul in Paphos?",
+            options: ["Paul struck Elymas blind", "Elymas was struck mute", "Elymas collapsed dead", "Elymas became paralyzed"],
+            correctIndex: 0,
+            analysis: "A mist and darkness fell upon Elymas, leaving him blind and seeking someone to lead him."
+        },
+        {
+            question: "What significant setback occurred when the missionary party reached Perga in Pamphylia?",
+            options: ["John Mark left the group and returned to Jerusalem", "Paul was shipwrecked", "Barnabas fell ill with malaria", "They were imprisoned by Roman guards"],
+            correctIndex: 0,
+            analysis: "At Perga, John Mark abruptly departed from Paul and Barnabas to return home."
+        },
+        {
+            question: "What crucial strategic shift did Paul and Barnabas announce in Pisidian Antioch upon facing Jewish resistance?",
+            options: ["Pivoted to preaching directly to the Gentiles", "Decided to end their missionary work", "Returned immediately to Jerusalem", "Focused solely on political leaders"],
+            correctIndex: 0,
+            analysis: "Paul declared: 'Since you reject it... we now turn to the Gentiles.'"
+        },
+        {
+            question: "How did the pagan crowd in Lystra mistakenly identify Paul and Barnabas after a man was healed?",
+            options: ["As gods in human form (Barnabas as Zeus, Paul as Hermes)", "As Roman emperors", "As Egyptian sorcerers", "As Jewish kings"],
+            correctIndex: 0,
+            analysis: "The crowd shouted that gods had come down, calling Barnabas Zeus and Paul Hermes."
+        },
+        {
+            question: "What caused the 'sharp disagreement' between Paul and Barnabas prior to the second journey?",
+            options: ["Disagreement over whether to take John Mark again", "Disagreement over financial compensation", "Disagreement over which route to sail", "Disagreement over theological doctrines"],
+            correctIndex: 0,
+            analysis: "Barnabas wanted to take John Mark, but Paul refused due to Mark's previous desertion."
+        },
+        {
+            question: "What divine vision did Paul receive while staying at Troas during his second journey?",
+            options: ["A vision of a Macedonian man begging 'Come over to Macedonia and help us'", "A vision of an angel standing in Rome", "A vision of Christ ascending into heaven", "A vision of the Temple in Jerusalem"],
+            correctIndex: 0,
+            analysis: "Paul saw a man of Macedonia standing and pleading for help, directing his course into Europe."
+        },
+        {
+            question: "What literary shift occurs in Acts 16:10 at Troas?",
+            options: ["First use of 'we', showing Luke joined the trip in Troas", "Shift from prose to apocalyptic poetry", "Shift from Greek to Aramaic language", "First use of formal legal titles"],
+            correctIndex: 0,
+            analysis: "The narrative changes from 'they' to 'we', indicating the author Luke joined Paul's team at Troas."
+        },
+        {
+            question: "Who was Lydia of Philippi, and how did she respond to the Gospel?",
+            options: ["A wealthy purple cloth dealer who was baptized with her household and hosted them", "A Roman guard who freed Paul", "A local priestess who converted", "A slave girl who ran away"],
+            correctIndex: 0,
+            analysis: "Lydia, a dealer in purple cloth, opened her heart, was baptized, and welcomed them into her home."
+        },
+        {
+            question: "Why were the Jews of Berea praised as noble in Acts 17:11?",
+            options: ["They eagerly examined Scriptures daily to verify Paul's teaching", "They gave large sums of money", "They built a huge synagogue", "They protected Paul with weapons"],
+            correctIndex: 0,
+            analysis: "They received the word with eagerness and examined the Scriptures daily to see if these things were true."
+        },
+        {
+            question: "What local inscription did Paul use as a theological bridge during his speech at the Areopagus in Athens?",
+            options: ["An altar dedicated 'To an unknown god'", "A statue of Zeus", "A temple to Caesar", "A legal inscription on the city wall"],
+            correctIndex: 0,
+            analysis: "Paul noted: 'I found an altar with this inscription: TO AN UNKNOWN GOD.'"
+        },
+        {
+            question: "Who were Priscilla and Aquila, and what trade did they share with Paul in Corinth?",
+            options: ["Jewish tentmakers with whom Paul lived and worked", "Roman governors who protected Paul", "Greek philosophers who converted", "Merchants who funded Paul's ship"],
+            correctIndex: 0,
+            analysis: "Aquila and Priscilla were tentmakers; Paul joined them in trade and ministry."
+        },
+        {
+            question: "Where did Paul teach daily in Ephesus after leaving the synagogue during his third journey?",
+            options: ["Lecture hall of Tyrannus for 2 years", "The temple of Artemis", "The public Roman bathhouse", "On the roof of Aquila's home"],
+            correctIndex: 0,
+            analysis: "After synagogue resistance, Paul withdrew to hold daily discussions in the lecture hall of Tyrannus for two years."
+        },
+        {
+            question: "What dramatic incident happened to young Eutychus during Paul's late-night sermon in Troas?",
+            options: ["Fell asleep in a 3rd-story window and fell to his death", "Fell into the harbor and nearly drowned", "Was bitten by a poisonous viper", "Was arrested by Roman guards"],
+            correctIndex: 0,
+            analysis: "As Paul spoke on until midnight, Eutychus sank into a deep sleep and fell from the third story, picked up dead."
+        },
+        {
+            question: "What prophetic warning did the prophet Agabus give to Paul at Caesarea?",
+            options: ["Bound his own hands/feet with Paul's belt, predicting Paul's arrest in Jerusalem", "Warned Paul that his ship would sink", "Predicted a severe drought in Rome", "Told Paul he would be crowned king"],
+            correctIndex: 0,
+            analysis: "Agabus took Paul's belt, bound his own feet and hands, declaring the owner would be bound by Jews in Jerusalem."
+        },
+        {
+            question: "What core theological question prompted the convening of the Council of Jerusalem?",
+            options: ["Whether Gentile converts must undergo circumcision and full Mosaic Law compliance", "Which books belong in the Old Testament canon", "The exact date of Easter celebration", "Whether bishops can marry"],
+            correctIndex: 0,
+            analysis: "The dispute centered on whether Gentile Christians had to be circumcised and keep Mosaic law to be saved."
+        },
+        {
+            question: "What specific prohibitions were placed on Gentile converts by the Council of Jerusalem decree?",
+            options: ["Avoid food sacrificed to idols, blood/strangled meat, and sexual immorality", "Avoid reading Greek philosophy, eating pork, and working on Sabbath", "Avoid serving in the Roman army, paying taxes, and wearing wool", "Avoid wine, marriage, and financial profit"],
+            correctIndex: 0,
+            analysis: "The council restricted: food polluted by idols, sexual immorality, meat of strangled animals, and blood."
+        },
+        {
+            question: "According to Church tradition, how and when was St. Paul martyred in Rome?",
+            options: ["Beheaded under Emperor Nero after the Great Fire of Rome in 64 CE", "Crucified upside down under Emperor Domitian", "Thrown to lions in the Colosseum", "Stoned to death in Jerusalem"],
+            correctIndex: 0,
+            analysis: "Tradition holds that Paul, as a Roman citizen, was beheaded outside Rome under Nero around 64–67 AD."
+        }
+    ];
+
+    const TOTAL = keyData.length;
+    let score = 0;
+    let answered = 0;
+
+    function shuffle(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function init() {
+        document.querySelectorAll('.total-count').forEach(el => el.textContent = TOTAL);
+        const container = document.getElementById('quiz-container');
+        const shuffledQuestions = shuffle(keyData);
+
+        shuffledQuestions.forEach((q, idx) => {
+            let options = q.options.map((opt, i) => ({ text: opt, correct: i === q.correctIndex }));
+            options = shuffle(options);
+
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-${idx}`;
+
+            const labels = ['A', 'B', 'C', 'D'];
+            let optsHTML = '';
+            options.forEach((opt, cIdx) => {
+                optsHTML += `<div class="option" data-correct="${opt.correct}" onclick="check('q-${idx}', this)">${labels[cIdx]}. ${opt.text}</div>`;
+            });
+
+            card.innerHTML = `
+                <div class="question-text">${idx + 1}. ${q.question}</div>
+                <div class="options-list">${optsHTML}</div>
+                <div class="analysis-box">
+                    <div class="analysis-title">Explanation</div>
+                    <p class="analysis-text">${q.analysis}</p>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function check(cardId, selectedOpt) {
+        const card = document.getElementById(cardId);
+        if (card.getAttribute('data-answered') === 'true') return;
+        card.setAttribute('data-answered', 'true');
+
+        const isCorrect = selectedOpt.getAttribute('data-correct') === 'true';
+        const options = card.querySelectorAll('.option');
+
+        options.forEach(opt => {
+            opt.classList.add('disabled');
+            const optCorrect = opt.getAttribute('data-correct') === 'true';
+            if (opt === selectedOpt) {
+                if (isCorrect) {
+                    opt.classList.add('correct');
+                    opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+                    score++;
+                } else {
+                    opt.classList.add('wrong');
+                    opt.innerHTML += ` <span class="status-tag wrong-tag">✕ Your answer</span>`;
+                }
+            } else if (optCorrect) {
+                opt.classList.add('correct');
+                opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+            }
+        });
+
+        card.querySelector('.analysis-box').style.display = 'block';
+        answered++;
+        document.getElementById('score-counter').textContent = score;
+        document.getElementById('answered-counter').textContent = answered;
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
