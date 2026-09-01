@@ -33,7 +33,6 @@
             max-width: 800px;
         }
 
-        /* Notification Banner */
         .toast-notification {
             position: fixed;
             bottom: 20px;
@@ -64,22 +63,6 @@
             border-color: var(--success);
         }
 
-        /* Loading Spinner */
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--text-muted);
-            border-top: 2px solid var(--accent-blue);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: none;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         .actions-bar {
             display: flex;
             gap: 10px;
@@ -89,6 +72,7 @@
             border-radius: 8px;
             border: 1px solid var(--border-color);
             align-items: center;
+            flex-wrap: wrap;
         }
 
         button {
@@ -196,37 +180,47 @@
     <h2>Quiz Structure Editor</h2>
     <div class="actions-bar">
         <button onclick="addMainFolder()">+ Add Main Folder</button>
-        <button class="btn-primary" onclick="exportData()">Export Index HTML</button>
-        <button id="save-btn" onclick="triggerSave()">
-            <span class="spinner" id="save-spinner"></span>
-            <span id="save-btn-text">Save Structure</span>
-        </button>
+        <button class="btn-primary" onclick="exportJSON()">💾 Download data.json</button>
+        <button onclick="exportData()">📄 Export Standalone index.html</button>
     </div>
 
-    <div id="editor-root"></div>
+    <div id="editor-root">Loading current repository structure...</div>
 </div>
 
-<!-- Toast Notification -->
 <div id="toast" class="toast-notification">
     <span id="toast-icon">✓</span>
-    <span id="toast-message">Structure saved successfully!</span>
+    <span id="toast-message">Data exported successfully!</span>
 </div>
 
 <script>
-    let structure = JSON.parse(localStorage.getItem('quiz_structure')) || [
-        {
-            name: "PRELIM",
-            subfolders: [
+    let structure = [];
+
+    async function initEditor() {
+        try {
+            const response = await fetch('data.json?t=' + Date.now());
+            if (response.ok) {
+                structure = await response.json();
+            } else {
+                throw new Error();
+            }
+        } catch (e) {
+            structure = [
                 {
-                    name: "THEOLOGY 103",
-                    quizzes: [
-                        { name: "Theo.1.11", url: "MQuizTheo.1.11.Complete.html" },
-                        { name: "Theo1.12", url: "MQuizTheo.1.12.html" }
+                    name: "PRELIM",
+                    subfolders: [
+                        {
+                            name: "THEOLOGY 103",
+                            quizzes: [
+                                { name: "Theo.1.11", url: "MQuizTheo.1.11.Complete.html" },
+                                { name: "Theo1.12", url: "MQuizTheo.1.12.html" }
+                            ]
+                        }
                     ]
                 }
-            ]
+            ];
         }
-    ];
+        renderEditor();
+    }
 
     function renderEditor() {
         const root = document.getElementById('editor-root');
@@ -281,41 +275,22 @@
     function removeSub(mIdx, sIdx) { structure[mIdx].subfolders[sIdx].splice(sIdx, 1); renderEditor(); }
     function removeQuiz(mIdx, sIdx, qIdx) { structure[mIdx].subfolders[sIdx].quizzes.splice(qIdx, 1); renderEditor(); }
 
-    // Save Logic with Loader & Notifier
-    function triggerSave() {
-        const btn = document.getElementById('save-btn');
-        const btnText = document.getElementById('save-btn-text');
-        const spinner = document.getElementById('save-spinner');
-
-        // Show Loading State
-        btn.disabled = true;
-        spinner.style.display = 'inline-block';
-        btnText.textContent = 'Saving...';
-
-        // Simulate async operation for visual feedback
-        setTimeout(() => {
-            localStorage.setItem('quiz_structure', JSON.stringify(structure));
-
-            // Reset Button State
-            spinner.style.display = 'none';
-            btnText.textContent = 'Save Structure';
-            btn.disabled = false;
-
-            // Trigger Notification
-            showToast('Structure saved successfully!');
-        }, 500);
+    function exportJSON() {
+        const dataStr = JSON.stringify(structure, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'data.json';
+        a.click();
+        showToast('data.json downloaded! Replace it in your repository.');
     }
 
     function showToast(message) {
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
-        
         toastMessage.textContent = message;
         toast.classList.add('show', 'success');
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     function exportData() {
@@ -404,7 +379,7 @@
         showToast('index.html exported successfully!');
     }
 
-    renderEditor();
+    initEditor();
 </script>
 </body>
 </html>
