@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theology 103: Key Facts Exam Prep</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --correct-bg: rgba(46, 160, 67, 0.15);
+            --correct-border: #2ea043;
+            --correct-text: #3fb950;
+            --wrong-bg: rgba(248, 81, 73, 0.15);
+            --wrong-border: #f85149;
+            --wrong-text: #ff7b72;
+            --analysis-bg: #1c2128;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 25px;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-box {
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .score-box {
+            color: var(--correct-text);
+        }
+
+        .answered-box {
+            color: #58a6ff;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #30363d;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: var(--option-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .option:not(.disabled):hover {
+            background-color: var(--option-hover);
+        }
+
+        .option.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--text-main);
+        }
+
+        .option.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--text-main);
+        }
+
+        .option.disabled {
+            cursor: default;
+        }
+
+        .status-tag {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .status-tag.correct-tag { color: var(--correct-text); }
+        .status-tag.wrong-tag { color: var(--wrong-text); }
+
+        .analysis-box {
+            margin-top: 15px;
+            background-color: var(--analysis-bg);
+            border-radius: 8px;
+            padding: 14px;
+            border-left: 3px solid #58a6ff;
+            display: none;
+        }
+
+        .analysis-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #58a6ff;
+            margin-bottom: 6px;
+        }
+
+        .analysis-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">Theology 103: Introduction to Church History LESS</h1>
+        <div class="stats-bar">
+            <div class="stat-box score-box">Score: <span id="score-counter">0</span> / <span class="total-count">42</span></div>
+            <div class="stat-box answered-box">Answered: <span id="answered-counter">0</span> / <span class="total-count">42</span></div>
+        </div>
+    </div>
+
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+    const keyData = [
+        {
+            question: "Who defined the Church by stating, 'The Church is not a hotel for saints, it is a hospital for sinners'?",
+            options: ["St. Thérèse of Lisieux", "St. Augustine", "St. Paul", "St. Peter"],
+            correctIndex: 1,
+            analysis: "St. Augustine famously described the Church as a 'hospital for sinners' to highlight its role as a place of healing and grace."
+        },
+        {
+            question: "According to Lumen Gentium (no. 1), the Church, in Christ, is a sacrament—a sign and instrument of what two realities?",
+            options: ["Social welfare and economic justice", "Political power and temporal victory", "Communion with God and unity among all people", "Scriptural interpretation and academic research"],
+            correctIndex: 2,
+            analysis: "Lumen Gentium (Vatican II, no. 1) teaches that the Church is a sign and instrument of union with God and unity among mankind."
+        },
+        {
+            question: "Catechism of the Catholic Church 771 states that the Church is at the same time a visible society and what else?",
+            options: ["A political institution", "A spiritual community", "A secular academy", "A temporary alliance"],
+            correctIndex: 1,
+            analysis: "CCC 771 defines the Church as both a visible structured society and a spiritual community."
+        },
+        {
+            question: "According to CCC 771, the Church is simultaneously a Mystical Body of Christ and what type of society?",
+            options: ["Democratic society", "Egalitarian society", "Hierarchical society", "Monastic society"],
+            correctIndex: 2,
+            analysis: "CCC 771 states the Church is simultaneously a hierarchical society and the spiritual Mystical Body of Christ."
+        },
+        {
+            question: "Which saint stated, 'In the heart of the Church, my mother, I will be love'?",
+            options: ["St. Augustine", "St. Thérèse of Lisieux", "St. Teresa of Avila", "St. Catherine of Siena"],
+            correctIndex: 1,
+            analysis: "St. Thérèse of Lisieux expressed her vocation as love at the heart of the Church."
+        },
+        {
+            question: "The English word 'church' originates from which Greek word meaning 'assembly' or 'gathering'?",
+            options: ["Koinonia", "Ekklesia", "Diakonia", "Leitourgia"],
+            correctIndex: 1,
+            analysis: "Originates from 'ekklesia' (to call out), designating an assembly called together by God."
+        },
+        {
+            question: "Which verse states: 'Now you are the body of Christ and individually members of it'?",
+            options: ["Acts 1:8", "1 Corinthians 12:27", "Matthew 16:18", "Romans 12:1"],
+            correctIndex: 1,
+            analysis: "St. Paul uses this body metaphor explicitly in 1 Corinthians 12:27."
+        },
+        {
+            question: "In Matthew 16:18, to whom does Jesus say: 'And I tell you, you are Peter, and on this rock I will build my church...'?",
+            options: ["John", "Peter", "Paul", "James"],
+            correctIndex: 1,
+            analysis: "Jesus changes Simon's name to Peter (Rock) and promises to build His Church on this foundation."
+        },
+        {
+            question: "According to Matthew 16:18, what will NOT prevail against the Church?",
+            options: ["The powers of Rome", "The gates of Hades", "The Jewish authorities", "The waves of the sea"],
+            correctIndex: 1,
+            analysis: "Jesus promises that 'the gates of Hades shall not prevail against it'."
+        },
+        {
+            question: "Before his ascension in Acts 1:8, what does Jesus state the believers will receive when the Holy Spirit comes upon them?",
+            options: ["Wealth", "Power", "Political titles", "Instant total knowledge"],
+            correctIndex: 1,
+            analysis: "Acts 1:8 notes believers receive power from the Holy Spirit to witness to all nations."
+        },
+        {
+            question: "In Acts 2:42, what is the FIRST essential practice to which early Christians devoted themselves?",
+            options: ["The apostles' teaching", "Building physical churches", "Political rallies", "Writing history books"],
+            correctIndex: 0,
+            analysis: "Acts 2:42 lists four essential practices starting with the apostles' teaching (didache)."
+        },
+        {
+            question: "In Acts 2:42, what is the SECOND essential practice mentioned alongside the apostles' teaching?",
+            options: ["Canon law", "Fellowship (community)", "Military training", "Tax collection"],
+            correctIndex: 1,
+            analysis: "The second practice is fellowship (koinonia)."
+        },
+        {
+            question: "In Acts 2:42, what is the THIRD essential practice listed in the description of early Christian life?",
+            options: ["The breaking of bread", "Sacrificing animals", "Debate with philosophers", "Fasting from water"],
+            correctIndex: 0,
+            analysis: "The third practice is the breaking of bread (Eucharist)."
+        },
+        {
+            question: "In Acts 2:42, what is the FOURTH essential practice highlighted in early Christian living?",
+            options: ["Scholastic writing", "The prayers", "Architectural development", "Trade negotiation"],
+            correctIndex: 1,
+            analysis: "The fourth fundamental practice listed is devotion to prayer."
+        },
+        {
+            question: "What are the approximate dates given for the period of Ancient Christianity?",
+            options: ["AD 590–1517", "AD 001–590", "AD 1517–1860", "AD 1860–Present"],
+            correctIndex: 1,
+            analysis: "Ancient Christianity spans AD 001 to AD 590."
+        },
+        {
+            question: "What are the dates for Medieval Christianity, which saw the center of Christianity shift to Europe?",
+            options: ["AD 001–590", "AD 590–1517", "AD 1517–1860", "AD 1860–Present"],
+            correctIndex: 1,
+            analysis: "Medieval Christianity spans AD 590 to AD 1517."
+        },
+        {
+            question: "What dates define Modern Christianity, stretching from Martin Luther to the modern missionary movement?",
+            options: ["AD 590–1517", "AD 1517–1860", "AD 1860–Present", "c. 1500–1200 BC"],
+            correctIndex: 1,
+            analysis: "Modern Christianity spans AD 1517 to AD 1860."
+        },
+        {
+            question: "Which period of Church history covers AD 1860–Present?",
+            options: ["Ancient Christianity", "Contemporary Christianity", "Medieval Christianity", "Modern Christianity"],
+            correctIndex: 1,
+            analysis: "Contemporary Christianity covers AD 1860 to the present."
+        },
+        {
+            question: "Which Scripture passage is cited as key to Theme 1 (History of Missions)?",
+            options: ["Matthew 28:19–20 (\"Go therefore and make disciples...\")", "John 15:20", "Titus 1:5", "1 Peter 3:15"],
+            correctIndex: 0,
+            analysis: "Matthew 28:19–20 (The Great Commission) drives the history of missions."
+        },
+        {
+            question: "Which key verse is quoted under Theme 2 (History of Persecutions)?",
+            options: ["\"If they persecuted me, they will persecute you also.\" (John 15:20)", "\"Appoint elders in every town...\"", "\"Let your light shine...\"", "\"Always be prepared to make a defense...\""],
+            correctIndex: 0,
+            analysis: "John 15:20 highlights Jesus' warning regarding persecution."
+        },
+        {
+            question: "Which verse is listed as a foundational scripture for Theme 3 (Church Govt. & Discipline)?",
+            options: ["\"Appoint elders in every town as I directed you.\" (Titus 1:5)", "Matthew 13:31", "1 Corinthians 12:27", "Acts 1:8"],
+            correctIndex: 0,
+            analysis: "Titus 1:5 establishes the directive to appoint leadership."
+        },
+        {
+            question: "Which Scripture passage is quoted as the lead text for Theme 5 (History of Christian Life)?",
+            options: ["\"Let your light shine before others...\" (Matthew 5:16)", "\"Go therefore and make disciples...\"", "\"You are Peter...\"", "\"Appoint elders in every town...\""],
+            correctIndex: 0,
+            analysis: "Matthew 5:16 commands believers to let their light shine through good works."
+        },
+        {
+            question: "Which key verse is quoted for Theme 6 (History of Theology)?",
+            options: ["\"Always be prepared to make a defense to anyone who calls you to account...\" (1 Peter 3:15)", "Acts 1:8", "Matthew 13:33", "John 15:20"],
+            correctIndex: 0,
+            analysis: "1 Peter 3:15 provides the scriptural basis for theology and apologetics."
+        },
+        {
+            question: "In the Four Marks of the Church, what does 'One' mean?",
+            options: ["Open to all people, cultures, and times", "United in one God, one faith, one Pope, and the same sacraments", "Built on the Apostles", "Guided by secular laws"],
+            correctIndex: 1,
+            analysis: "Signifies unity in faith, God, sacraments, and leadership under the Pope."
+        },
+        {
+            question: "In the Four Marks of the Church, what does 'Holy' signify?",
+            options: ["Built exclusively out of gold and marble", "Founded by Jesus, guided by the Holy Spirit, and helps people become saints", "Governed strictly by civil authorities", "Existing only in heavenly dimensions"],
+            correctIndex: 1,
+            analysis: "Stems from its divine Founder, guide, and objective to sanctify."
+        },
+        {
+            question: "What is the direct definition of 'Catholic' in the Four Marks?",
+            options: ["Universal: open to all people, cultures, and times", "Restricted to the city of Rome", "Governed by ancient philosophers", "Originating solely in 16th-century Europe"],
+            correctIndex: 0,
+            analysis: "'Catholic' means universal—open across all places and ages."
+        },
+        {
+            question: "In the Four Marks, what does 'Apostolic' mean?",
+            options: ["Written entirely in Greek", "Built on the Apostles, with bishops as their successors", "Confined to the first century AD", "Managed by military leaders"],
+            correctIndex: 1,
+            analysis: "Rooted in the foundation and succession of the Apostles."
+        },
+        {
+            question: "Which foreign power ruled Palestine during 1500–1200 BC?",
+            options: ["Egypt", "Assyrian Empire", "Neo-Babylonian Empire", "Persian Empire"],
+            correctIndex: 0,
+            analysis: "Ancient Egypt held dominant influence over Palestine in this era."
+        },
+        {
+            question: "Which power ruled Palestine during 722–612 BC?",
+            options: ["Egyptian Empire", "Assyrian Empire", "Roman Empire", "Greek Empire"],
+            correctIndex: 1,
+            analysis: "The Assyrian Empire conquered Israel and dominated the region."
+        },
+        {
+            question: "Which foreign power controlled Palestine during 586–539 BC?",
+            options: ["Neo-Babylonian Empire", "Persian Empire", "Roman Empire", "Jewish Hasmoneans"],
+            correctIndex: 0,
+            analysis: "The Neo-Babylonian Empire destroyed Jerusalem and took captives in 586 BC."
+        },
+        {
+            question: "Which power governed Palestine during 539–332 BC?",
+            options: ["Persian Empire", "Assyrian Empire", "Greek Empire", "Roman Empire"],
+            correctIndex: 0,
+            analysis: "Persian rule under Cyrus permitted Jews to rebuild the Temple."
+        },
+        {
+            question: "Who led foreign rule over Palestine during 332–167 BC?",
+            options: ["Pompey and Augustus", "Alexander the Great and Successors", "Cyrus the Great", "Nebuchadnezzar"],
+            correctIndex: 1,
+            analysis: "Alexander the Great and Hellenistic Greek dynasties ruled Palestine."
+        },
+        {
+            question: "What era of rule occurred in Palestine during 167–63 BC?",
+            options: ["Roman Rule", "Hasmonean Independence (Jewish Rule)", "Egyptian Influence", "Persian Rule"],
+            correctIndex: 1,
+            analysis: "The Maccabean Revolt launched Hasmonean Jewish self-rule."
+        },
+        {
+            question: "Which foreign power ruled Palestine from 63 BC onward?",
+            options: ["Roman Empire", "Neo-Babylonian Empire", "Assyrian Empire", "Greek Empire"],
+            correctIndex: 0,
+            analysis: "General Pompey incorporated Judea into the Roman Empire."
+        },
+        {
+            question: "What historical uprising was directly provoked by the persecutions of Antiochus IV between 167–160 BC?",
+            options: ["The Zealot Rebellion", "The Maccabean Revolt", "The Bar Kokhba Revolt", "The Roman Civil War"],
+            correctIndex: 1,
+            analysis: "Antiochus IV's desecration triggered the Maccabean Revolt."
+        },
+        {
+            question: "Who was the very first Roman Emperor?",
+            options: ["Julius Caesar", "Augustus", "Tiberius", "Nero"],
+            correctIndex: 1,
+            analysis: "Augustus (Octavian) became Rome's first official Emperor in 27 BC."
+        },
+        {
+            question: "What is the Latin term for the long period of peace across the empire under Augustus?",
+            options: ["Pax Romana", "Lex Romana", "Via Appia", "Imperium Romanum"],
+            correctIndex: 0,
+            analysis: "Pax Romana refers to the era of Roman stability aiding mission work."
+        },
+        {
+            question: "Whom did Rome appoint as King of Judea to rule from 37 to 4 BC?",
+            options: ["Herod Antipas", "Herod the Great", "Pontius Pilate", "Archelaus"],
+            correctIndex: 1,
+            analysis: "Herod the Great was appointed client King of Judea by Rome."
+        },
+        {
+            question: "Which Jewish group emphasized strict observance of the written and oral Law?",
+            options: ["Sadducees", "Pharisees", "Essenes", "Zealots"],
+            correctIndex: 1,
+            analysis: "The Pharisees focused on meticulous keeping of religious law."
+        },
+        {
+            question: "Which Jewish group comprised the priestly elite controlling the Temple?",
+            options: ["Sadducees", "Pharisees", "Samaritans", "Galileans"],
+            correctIndex: 0,
+            analysis: "The Sadducees were the aristocratic priestly class in charge of the Temple."
+        },
+        {
+            question: "What was the everyday spoken language of Jews in 1st-century Palestine?",
+            options: ["Greek", "Aramaic", "Latin", "Hebrew"],
+            correctIndex: 1,
+            analysis: "Aramaic was the common spoken vernacular in daily life."
+        },
+        {
+            question: "In 1st-century Palestine, which language was primarily reserved for Jewish worship?",
+            options: ["Aramaic", "Hebrew", "Greek", "Latin"],
+            correctIndex: 1,
+            analysis: "Hebrew was preserved specifically for liturgical scripture readings."
+        }
+    ];
+
+    const TOTAL = keyData.length;
+    let score = 0;
+    let answered = 0;
+
+    function shuffle(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function init() {
+        document.querySelectorAll('.total-count').forEach(el => el.textContent = TOTAL);
+        const container = document.getElementById('quiz-container');
+        const shuffledQuestions = shuffle(keyData);
+
+        shuffledQuestions.forEach((q, idx) => {
+            let options = q.options.map((opt, i) => ({ text: opt, correct: i === q.correctIndex }));
+            options = shuffle(options);
+
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-${idx}`;
+
+            const labels = ['A', 'B', 'C', 'D'];
+            let optsHTML = '';
+            options.forEach((opt, cIdx) => {
+                optsHTML += `<div class="option" data-correct="${opt.correct}" onclick="check('q-${idx}', this)">${labels[cIdx]}. ${opt.text}</div>`;
+            });
+
+            card.innerHTML = `
+                <div class="question-text">${idx + 1}. ${q.question}</div>
+                <div class="options-list">${optsHTML}</div>
+                <div class="analysis-box">
+                    <div class="analysis-title">AI Analysis</div>
+                    <p class="analysis-text">${q.analysis}</p>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function check(cardId, selectedOpt) {
+        const card = document.getElementById(cardId);
+        if (card.getAttribute('data-answered') === 'true') return;
+        card.setAttribute('data-answered', 'true');
+
+        const isCorrect = selectedOpt.getAttribute('data-correct') === 'true';
+        const options = card.querySelectorAll('.option');
+
+        options.forEach(opt => {
+            opt.classList.add('disabled');
+            const optCorrect = opt.getAttribute('data-correct') === 'true';
+            if (opt === selectedOpt) {
+                if (isCorrect) {
+                    opt.classList.add('correct');
+                    opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+                    score++;
+                } else {
+                    opt.classList.add('wrong');
+                    opt.innerHTML += ` <span class="status-tag wrong-tag">✕ Your answer</span>`;
+                }
+            } else if (optCorrect) {
+                opt.classList.add('correct');
+                opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+            }
+        });
+
+        card.querySelector('.analysis-box').style.display = 'block';
+        answered++;
+        document.getElementById('score-counter').textContent = score;
+        document.getElementById('answered-counter').textContent = answered;
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
