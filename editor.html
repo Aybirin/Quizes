@@ -33,6 +33,33 @@
             max-width: 800px;
         }
 
+        .config-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .config-card h3 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--accent-blue);
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .config-grid { grid-template-columns: 1fr; }
+        }
+
         .toast-notification {
             position: fixed;
             bottom: 20px;
@@ -59,8 +86,22 @@
             pointer-events: auto;
         }
 
-        .toast-notification.success {
-            border-color: var(--success);
+        .toast-notification.success { border-color: var(--success); }
+        .toast-notification.error { border-color: var(--danger); }
+
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--text-muted);
+            border-top: 2px solid var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .actions-bar {
@@ -178,24 +219,52 @@
 
 <div class="container">
     <h2>Quiz Structure Editor</h2>
-    <div class="actions-bar">
-        <button onclick="addMainFolder()">+ Add Main Folder</button>
-        <button class="btn-primary" onclick="exportJSON()">💾 Download data.json</button>
-        <button onclick="exportData()">📄 Export Standalone index.html</button>
+
+    <!-- GitHub Setup Form -->
+    <div class="config-card">
+        <h3>GitHub Sync Configuration</h3>
+        <div class="config-grid">
+            <input type="text" id="gh-owner" placeholder="GitHub Username / Org (e.g., john-doe)" onchange="saveConfig()">
+            <input type="text" id="gh-repo" placeholder="Repository Name (e.g., mock-quizzes)" onchange="saveConfig()">
+        </div>
+        <input type="password" id="gh-token" placeholder="GitHub Personal Access Token (PAT)" onchange="saveConfig()">
+        <span style="font-size: 0.78rem; color: var(--text-muted);">Token is stored locally in your browser. Needs 'Contents' write permissions.</span>
     </div>
 
-    <div id="editor-root">Loading current repository structure...</div>
+    <div class="actions-bar">
+        <button onclick="addMainFolder()">+ Add Main Folder</button>
+        <button class="btn-primary" id="commit-btn" onclick="commitToGitHub()">
+            <span class="spinner" id="btn-spinner"></span>
+            <span id="btn-text">🚀 Save & Push to GitHub</span>
+        </button>
+    </div>
+
+    <div id="editor-root">Loading quiz structure...</div>
 </div>
 
 <div id="toast" class="toast-notification">
     <span id="toast-icon">✓</span>
-    <span id="toast-message">Data exported successfully!</span>
+    <span id="toast-message">Operation successful!</span>
 </div>
 
 <script>
     let structure = [];
+    let fileSha = null;
+
+    function saveConfig() {
+        localStorage.setItem('gh_owner', document.getElementById('gh-owner').value.trim());
+        localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim());
+        localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim());
+    }
+
+    function loadConfig() {
+        document.getElementById('gh-owner').value = localStorage.getItem('gh_owner') || '';
+        document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || '';
+        document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
+    }
 
     async function initEditor() {
+        loadConfig();
         try {
             const response = await fetch('data.json?t=' + Date.now());
             if (response.ok) {
@@ -204,20 +273,7 @@
                 throw new Error();
             }
         } catch (e) {
-            structure = [
-                {
-                    name: "PRELIM",
-                    subfolders: [
-                        {
-                            name: "THEOLOGY 103",
-                            quizzes: [
-                                { name: "Theo.1.11", url: "MQuizTheo.1.11.Complete.html" },
-                                { name: "Theo1.12", url: "MQuizTheo.1.12.html" }
-                            ]
-                        }
-                    ]
-                }
-            ];
+            structure = [{ name: "PRELIM", subfolders: [] }];
         }
         renderEditor();
     }
@@ -275,108 +331,82 @@
     function removeSub(mIdx, sIdx) { structure[mIdx].subfolders[sIdx].splice(sIdx, 1); renderEditor(); }
     function removeQuiz(mIdx, sIdx, qIdx) { structure[mIdx].subfolders[sIdx].quizzes.splice(qIdx, 1); renderEditor(); }
 
-    function exportJSON() {
-        const dataStr = JSON.stringify(structure, null, 2);
-        const blob = new Blob([dataStr], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'data.json';
-        a.click();
-        showToast('data.json downloaded! Replace it in your repository.');
+    async function commitToGitHub() {
+        const owner = document.getElementById('gh-owner').value.trim();
+        const repo = document.getElementById('gh-repo').value.trim();
+        const token = document.getElementById('gh-token').value.trim();
+
+        if (!owner || !repo || !token) {
+            showToast('Please fill out Owner, Repo, and GitHub Token.', false);
+            return;
+        }
+
+        const btn = document.getElementById('commit-btn');
+        const btnText = document.getElementById('btn-text');
+        const spinner = document.getElementById('btn-spinner');
+
+        btn.disabled = true;
+        spinner.style.display = 'inline-block';
+        btnText.textContent = 'Pushing to GitHub...';
+
+        try {
+            const getFileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/data.json`;
+            const getRes = await fetch(getFileUrl, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            let currentSha = null;
+            if (getRes.ok) {
+                const getJson = await getRes.json();
+                currentSha = getJson.sha;
+            }
+
+            const contentString = JSON.stringify(structure, null, 2);
+            const encodedContent = btoa(unescape(encodeURIComponent(contentString)));
+
+            const putRes = await fetch(getFileUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                body: JSON.stringify({
+                    message: 'Update data.json via Quiz Structure Editor',
+                    content: encodedContent,
+                    sha: currentSha || undefined
+                })
+            });
+
+            if (!putRes.ok) {
+                const errData = await putRes.json();
+                throw new Error(errData.message || 'GitHub API rejected request');
+            }
+
+            showToast('data.json successfully updated on GitHub!', true);
+        } catch (err) {
+            console.error(err);
+            showToast(`Error: ${err.message}`, false);
+        } finally {
+            spinner.style.display = 'none';
+            btnText.textContent = '🚀 Save & Push to GitHub';
+            btn.disabled = false;
+        }
     }
 
-    function showToast(message) {
+    function showToast(message, isSuccess) {
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
+        const toastIcon = document.getElementById('toast-icon');
+
         toastMessage.textContent = message;
-        toast.classList.add('show', 'success');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
+        toastIcon.textContent = isSuccess ? '✓' : '✕';
+        toast.className = `toast-notification show ${isSuccess ? 'success' : 'error'}`;
 
-    function exportData() {
-        const dataStr = JSON.stringify(structure, null, 2);
-        const indexHtmlContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BSCE 2A-1 MOCK QUIZZES</title>
-    <style>
-        :root { --bg-color: #0d1117; --card-bg: #161b22; --text-main: #e6edf3; --text-muted: #8b949e; --option-bg: #21262d; --option-hover: #30363d; --accent-blue: #58a6ff; --border-color: #30363d; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 650px; padding: 20px; box-sizing: border-box; }
-        .header { position: sticky; top: 0; background-color: var(--bg-color); padding: 15px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 25px; z-index: 100; }
-        .title { font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--text-main); }
-        .subtitle { font-size: 0.88rem; color: var(--text-muted); margin-top: 5px; }
-        .folder-list { display: flex; flex-direction: column; gap: 16px; }
-        details.folder { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
-        details.folder[open] { border-color: var(--accent-blue); }
-        summary.folder-title { padding: 16px 20px; font-size: 1rem; font-weight: 600; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; user-select: none; background-color: var(--card-bg); }
-        summary.folder-title:hover { background-color: var(--option-hover); }
-        summary.folder-title::-webkit-details-marker { display: none; }
-        summary.folder-title::before { content: "📁 "; margin-right: 10px; font-size: 1.1rem; }
-        details[open] > summary.folder-title::before { content: "📂 "; }
-        summary.folder-title::after { content: "▷"; font-size: 0.8rem; color: var(--text-muted); transition: transform 0.2s; }
-        details[open] > summary.folder-title::after { transform: rotate(90deg); color: var(--accent-blue); }
-        .folder-content { padding: 10px 20px 20px 20px; background-color: var(--bg-color); border-top: 1px solid var(--border-color); }
-        details.subfolder { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-top: 10px; }
-        summary.subfolder-title { padding: 12px 16px; font-size: 0.92rem; font-weight: 600; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; user-select: none; }
-        summary.subfolder-title::-webkit-details-marker { display: none; }
-        summary.subfolder-title::before { content: "🗂️ "; margin-right: 8px; }
-        details[open] > summary.subfolder-title::before { content: "📂 "; }
-        summary.subfolder-title::after { content: "►"; font-size: 0.75rem; color: var(--text-muted); transition: transform 0.2s; }
-        details[open] > summary.subfolder-title::after { transform: rotate(90deg); }
-        .subfolder-content { padding: 8px 12px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
-        .quiz-link { display: flex; align-items: center; padding: 10px 14px; background-color: var(--option-bg); color: var(--accent-blue); text-decoration: none; border-radius: 6px; font-size: 0.9rem; font-weight: 500; border: 1px solid transparent; transition: all 0.2s; }
-        .quiz-link:hover { background-color: var(--option-hover); border-color: var(--accent-blue); }
-        .quiz-link::before { content: "🟢"; margin-right: 10px; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1 class="title">BSCE 2A-1 MOCK QUIZZES</h1>
-        <div class="subtitle">Select a subject folder to access quizzes</div>
-    </div>
-    <div id="folder-container" class="folder-list"></div>
-</div>
-<script>
-    const data = ${dataStr};
-    const container = document.getElementById('folder-container');
-    
-    data.forEach(main => {
-        const folder = document.createElement('details');
-        folder.className = 'folder';
-        let subHTML = '';
-        
-        main.subfolders.forEach(sub => {
-            let quizHTML = '';
-            sub.quizzes.forEach(q => {
-                quizHTML += \`<a href="\${q.url}" class="quiz-link">\${q.name}</a>\`;
-            });
-            subHTML += \`
-                <details class="subfolder">
-                    <summary class="subfolder-title">\${sub.name}</summary>
-                    <div class="subfolder-content">\${quizHTML}</div>
-                </details>\`;
-        });
-        
-        folder.innerHTML = \`
-            <summary class="folder-title">\${main.name}</summary>
-            <div class="folder-content">\${subHTML}</div>\`;
-        container.appendChild(folder);
-    });
-<\/script>
-</body>
-</html>`;
-
-        const blob = new Blob([indexHtmlContent], { type: 'text/html' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'index.html';
-        a.click();
-        
-        showToast('index.html exported successfully!');
+        setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
     initEditor();
