@@ -222,9 +222,8 @@
     async function loadQuizData() {
         const container = document.getElementById('folder-container');
         try {
-            // Fetch live data from repository with cache-busting timestamp
             const response = await fetch('data.json?t=' + Date.now());
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('Failed to load JSON');
             const data = await response.json();
 
             container.innerHTML = '';
@@ -261,7 +260,7 @@
             });
         } catch (error) {
             console.error('Error fetching quiz structure:', error);
-            container.innerHTML = `<div class="status-msg" style="color: var(--accent-blue);">Failed to load quiz data. Ensure data.json exists in the repository.</div>`;
+            container.innerHTML = `<div class="status-msg" style="color: var(--accent-blue);">Failed to load quiz data. Ensure data.json exists.</div>`;
         }
     }
 
