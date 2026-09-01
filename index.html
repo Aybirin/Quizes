@@ -197,6 +197,12 @@
             content: "🟢";
             margin-right: 10px;
         }
+
+        .status-msg {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -207,67 +213,59 @@
         <div class="subtitle">Select a subject folder to access quizzes</div>
     </div>
 
-    <div id="folder-container" class="folder-list"></div>
+    <div id="folder-container" class="folder-list">
+        <div class="status-msg">Loading quizzes...</div>
+    </div>
 </div>
 
 <script>
-    const defaultData = [
-        {
-            name: "PRELIM",
-            subfolders: [
-                {
-                    name: "THEOLOGY 103",
-                    quizzes: [
-                        { name: "Theo.1.11", url: "MQuizTheo.1.11.Complete.html" },
-                        { name: "Theo1.12", url: "MQuizTheo.1.12.html" },
-                        { name: "Theo.2.11", url: "MQuizTheo.2.11Complete.html" },
-                        { name: "Theo.2.12", url: "MQuizTheo.2.12.html" }
-                    ]
-                },
-                {
-                    name: "GEC 105",
-                    quizzes: [
-                        { name: "GEC105.2", url: "MQuizGec105.2.Complete.html" },
-                        { name: "GEC105.4", url: "MQuizGec105.4.Complete.html" }
-                    ]
-                }
-            ]
-        }
-    ];
+    async function loadQuizData() {
+        const container = document.getElementById('folder-container');
+        try {
+            // Fetch live data from repository with cache-busting timestamp
+            const response = await fetch('data.json?t=' + Date.now());
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
 
-    const data = JSON.parse(localStorage.getItem('quiz_structure')) || defaultData;
-    const container = document.getElementById('folder-container');
+            container.innerHTML = '';
+            
+            data.forEach(main => {
+                const folder = document.createElement('details');
+                folder.className = 'folder';
 
-    data.forEach(main => {
-        const folder = document.createElement('details');
-        folder.className = 'folder';
+                let subHTML = '';
+                main.subfolders.forEach(sub => {
+                    let quizHTML = '';
+                    sub.quizzes.forEach(q => {
+                        quizHTML += `<a href="${q.url}" class="quiz-link">${q.name}</a>`;
+                    });
 
-        let subHTML = '';
-        main.subfolders.forEach(sub => {
-            let quizHTML = '';
-            sub.quizzes.forEach(q => {
-                quizHTML += `<a href="${q.url}" class="quiz-link">${q.name}</a>`;
-            });
+                    subHTML += `
+                        <details class="subfolder">
+                            <summary class="subfolder-title">${sub.name}</summary>
+                            <div class="subfolder-content">
+                                ${quizHTML}
+                            </div>
+                        </details>
+                    `;
+                });
 
-            subHTML += `
-                <details class="subfolder">
-                    <summary class="subfolder-title">${sub.name}</summary>
-                    <div class="subfolder-content">
-                        ${quizHTML}
+                folder.innerHTML = `
+                    <summary class="folder-title">${main.name}</summary>
+                    <div class="folder-content">
+                        ${subHTML}
                     </div>
-                </details>
-            `;
-        });
+                `;
 
-        folder.innerHTML = `
-            <summary class="folder-title">${main.name}</summary>
-            <div class="folder-content">
-                ${subHTML}
-            </div>
-        `;
+                container.appendChild(folder);
+            });
+        } catch (error) {
+            console.error('Error fetching quiz structure:', error);
+            container.innerHTML = `<div class="status-msg" style="color: var(--accent-blue);">Failed to load quiz data. Ensure data.json exists in the repository.</div>`;
+        }
+    }
 
-        container.appendChild(folder);
-    });
+    loadQuizData();
 </script>
 
 </body>
