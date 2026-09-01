@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESMAN Decision Making: Key Facts Exam Prep (Flipped Questions)</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --correct-bg: rgba(46, 160, 67, 0.15);
+            --correct-border: #2ea043;
+            --correct-text: #3fb950;
+            --wrong-bg: rgba(248, 81, 73, 0.15);
+            --wrong-border: #f85149;
+            --wrong-text: #ff7b72;
+            --analysis-bg: #1c2128;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 25px;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-box {
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .score-box {
+            color: var(--correct-text);
+        }
+
+        .answered-box {
+            color: #58a6ff;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #30363d;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: var(--option-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .option:not(.disabled):hover {
+            background-color: var(--option-hover);
+        }
+
+        .option.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--text-main);
+        }
+
+        .option.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--text-main);
+        }
+
+        .option.disabled {
+            cursor: default;
+        }
+
+        .status-tag {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .status-tag.correct-tag { color: var(--correct-text); }
+        .status-tag.wrong-tag { color: var(--wrong-text); }
+
+        .analysis-box {
+            margin-top: 15px;
+            background-color: var(--analysis-bg);
+            border-radius: 8px;
+            padding: 14px;
+            border-left: 3px solid #58a6ff;
+            display: none;
+        }
+
+        .analysis-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #58a6ff;
+            margin-bottom: 6px;
+        }
+
+        .analysis-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">ESMAN: Decision Making Exam Prep (Flipped Questions)</h1>
+        <div class="stats-bar">
+            <div class="stat-box score-box">Score: <span id="score-counter">0</span> / <span class="total-count">28</span></div>
+            <div class="stat-box answered-box">Answered: <span id="answered-counter">0</span> / <span class="total-count">28</span></div>
+        </div>
+    </div>
+
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+    const keyData = [
+        {
+            question: "\"The process of identifying and choosing alternative courses of action in a manner appropriate to the demands of the situation\" is the definition of what?",
+            options: [
+                "Strategic Auditing",
+                "Decision Making",
+                "Delegation of Authority",
+                "Operations Management"
+            ],
+            correctIndex: 1,
+            analysis: "Decision making is formally defined as the process of identifying and choosing alternative courses of action appropriate to the situation."
+        },
+        {
+            question: "Which managerial concept is defined as \"the heart of all management functions\"?",
+            options: [
+                "Marketing Management",
+                "Human Resource Planning",
+                "Decision Making",
+                "Workplace Communication"
+            ],
+            correctIndex: 2,
+            analysis: "Decision making is described as 'the heart of all management functions' because all managerial duties center around making choices."
+        },
+        {
+            question: "\"An understandable managerial occurrence where wrong choices are made, which a wise manager must correct as soon as identified\" describes what?",
+            options: [
+                "Managerial Mistakes",
+                "Operational Failure",
+                "Systemic Risk",
+                "Executive Negligence"
+            ],
+            correctIndex: 0,
+            analysis: "Making wrong decisions occasionally is understandable for managers, provided the wise manager corrects them promptly."
+        },
+        {
+            question: "\"A manager who cannot or does not want to make decisions\" represents what concept in engineering management?",
+            options: [
+                "The ideal delegator",
+                "A bigger issue than making occasional wrong decisions",
+                "A standard stage in corporate restructuring",
+                "An effective risk-mitigation strategy"
+            ],
+            correctIndex: 1,
+            analysis: "The text highlights that indecision or refusal to make decisions is a far bigger issue than making a wrong decision."
+        },
+        {
+            question: "\"Becoming bigger and more complicated as a manager reaches higher organizational tiers\" refers to which process?",
+            options: [
+                "Technical Drafting",
+                "Decision Making",
+                "Qualitative Assessment",
+                "Task Automation"
+            ],
+            correctIndex: 1,
+            analysis: "As management levels increase, the scope and complexity of decision-making increase proportionally."
+        },
+        {
+            question: "\"Identifying the problem as the mandatory first move for a manager wanting to make an intelligent decision\" defines which step?",
+            options: [
+                "Analyze Environment",
+                "Develop Alternatives",
+                "Diagnose Problem",
+                "Make a Choice"
+            ],
+            correctIndex: 2,
+            analysis: "Diagnose Problem is the first step in the decision-making process; without it, succeeding in subsequent steps is nearly impossible."
+        },
+        {
+            question: "\"Internal and external factors that play a very significant role in the success or failure of an organization\" defines what?",
+            options: [
+                "Components of the Environment",
+                "Qualitative Criteria",
+                "Feedback Loops",
+                "Constraint Bounds"
+            ],
+            correctIndex: 0,
+            analysis: "The environment consists of two major components—internal and external—which determine organizational success or failure."
+        },
+        {
+            question: "\"Prepare, Determine, and Revise\" is the defined step-by-step procedure for which process?",
+            options: [
+                "Executing a Simulation",
+                "Developing Viable Alternatives",
+                "Calculating Economic Order Quantity",
+                "Setting Linear Constraints"
+            ],
+            correctIndex: 1,
+            analysis: "Developing viable alternatives involves a three-step procedure: Prepare, Determine, and Revise."
+        },
+        {
+            question: "\"Assessing remaining options after determining their viability and creating a revised list\" defines which step?",
+            options: [
+                "Diagnose Problem",
+                "Evaluate Alternatives",
+                "Implement Decision",
+                "Adapt Decision Results"
+            ],
+            correctIndex: 1,
+            analysis: "Evaluating alternatives takes place once viability is checked and a revised list of options is prepared."
+        },
+        {
+            question: "\"Ranking alternatives from best to worst on the basis of factors like benefit, cost, or risk\" defines which step?",
+            options: [
+                "Make a Choice",
+                "Analyze Environment",
+                "Diagnose Problem",
+                "Establish Control"
+            ],
+            correctIndex: 0,
+            analysis: "Making a choice is facilitated by ranking alternatives from best to worst using criteria such as cost, risk, or benefit."
+        },
+        {
+            question: "\"Carrying out the decision so that objectives are achieved, which requires devising a plan\" defines what step?",
+            options: [
+                "Implement Decision",
+                "Evaluate Alternatives",
+                "Qualitative Evaluation",
+                "Forecasting"
+            ],
+            correctIndex: 0,
+            analysis: "Implement Decision refers to putting the chosen alternative into action via a devised plan to achieve goals."
+        },
+        {
+            question: "\"Using control and feedback mechanisms to ensure expected results occur and inform future choices\" describes what?",
+            options: [
+                "Diagnose Problem",
+                "Evaluate and Adapt Decision Results",
+                "Develop Alternatives",
+                "Linear Programming"
+            ],
+            correctIndex: 1,
+            analysis: "Evaluating and adapting decision results relies on control and feedback mechanisms to refine future decision-making."
+        },
+        {
+            question: "\"Evaluation of alternatives using intuition and subjective judgment for simple, low-cost, or urgent problems\" defines what?",
+            options: [
+                "Quantitative Evaluation",
+                "Regression Analysis",
+                "Qualitative Evaluation",
+                "Critical Path Method"
+            ],
+            correctIndex: 2,
+            analysis: "Qualitative evaluation relies on subjective judgment and intuition, best suited for simple, low-cost, or time-sensitive situations."
+        },
+        {
+            question: "\"Evaluating alternatives using any technique in a group classified as rational and analytical\" defines what?",
+            options: [
+                "Quantitative Evaluation",
+                "Qualitative Evaluation",
+                "Subjective Assessment",
+                "Managerial Intuition"
+            ],
+            correctIndex: 0,
+            analysis: "Quantitative evaluation relies on rational, analytical, and mathematically driven techniques."
+        },
+        {
+            question: "\"An inventory management technique used to determine the optimal order quantity that minimizes total inventory/setup costs\" defines what?",
+            options: [
+                "Back Order Inventory Model",
+                "Economic Order Quantity (EOQ) Model",
+                "Quantity Discount Model",
+                "Production Order Quantity Model"
+            ],
+            correctIndex: 1,
+            analysis: "The EOQ model calculates the order quantity that balances setup and holding costs to minimize total inventory costs."
+        },
+        {
+            question: "\"A formula used to determine the optimal batch size for production runs when a product is manufactured and consumed simultaneously\" defines what?",
+            options: [
+                "Production Order Quantity Model",
+                "Economic Order Quantity Model",
+                "Linear Programming",
+                "Queuing Theory"
+            ],
+            correctIndex: 0,
+            analysis: "The Production Order Quantity model calculates batch sizes for products manufactured and consumed at the same time."
+        },
+        {
+            question: "\"A system where businesses accept orders for products currently out of stock, with the intention of fulfilling them upon replenishment\" defines what?",
+            options: [
+                "Back Order Inventory Model",
+                "Quantity Discount Model",
+                "Simulation Model",
+                "Sampling Theory"
+            ],
+            correctIndex: 0,
+            analysis: "A back order model allows businesses to process sales for out-of-stock items to be fulfilled later."
+        },
+        {
+            question: "\"A pricing strategy offering lower prices per unit for larger purchase quantities to increase sales volume\" defines what?",
+            options: [
+                "Economic Order Quantity Model",
+                "Quantity Discount Model",
+                "Production Order Quantity Model",
+                "Linear Programming"
+            ],
+            correctIndex: 1,
+            analysis: "Quantity discount models offer unit price reductions for bulk purchases to encourage higher sales volume."
+        },
+        {
+            question: "\"A model describing how to determine the number of service units that will minimize both customer waiting time and cost of service\" defines what?",
+            options: [
+                "Queuing Theory",
+                "Sampling Theory",
+                "Regression Analysis",
+                "Critical Path Method"
+            ],
+            correctIndex: 0,
+            analysis: "Queuing Theory optimizes the balance between service availability costs and customer wait times."
+        },
+        {
+            question: "\"Models where large, complex tasks are broken into smaller segments that can be managed independently\" defines what?",
+            options: [
+                "Network Models",
+                "Inventory Models",
+                "Qualitative Models",
+                "Statistical Decision Models"
+            ],
+            correctIndex: 0,
+            analysis: "Network models divide large project operations into distinct, manageable segments."
+        },
+        {
+            question: "\"A project management technique used to identify the sequence of activities that determines the project's overall duration\" defines what?",
+            options: [
+                "Critical Path Method (CPM)",
+                "Program Evaluation and Review Technique (PERT)",
+                "Regression Analysis",
+                "Simulation"
+            ],
+            correctIndex: 0,
+            analysis: "CPM calculates the longest sequence of dependent activities to identify total project duration."
+        },
+        {
+            question: "\"A project management tool used to analyze and represent the tasks involved in completing a project\" defines what?",
+            options: [
+                "Program Evaluation and Review Technique (PERT)",
+                "Linear Programming",
+                "Sampling Theory",
+                "Economic Order Quantity Model"
+            ],
+            correctIndex: 0,
+            analysis: "PERT is a network analysis tool mapping out the sequential relationships and time frame of project tasks."
+        },
+        {
+            question: "\"Decision-making techniques used when present manager decisions carry implications in the future\" refers to what overall category?",
+            options: [
+                "Forecasting",
+                "Backorder Management",
+                "Qualitative Intuition",
+                "Immediate Problem Solving"
+            ],
+            correctIndex: 0,
+            analysis: "Forecasting methods predict future outcomes to aid current decision-making that has long-term impact."
+        },
+        {
+            question: "\"A forecasting method that examines the association between two or more variables using historical data to predict future events\" defines what?",
+            options: [
+                "Simulation",
+                "Regression Analysis",
+                "Sampling Theory",
+                "Linear Programming"
+            ],
+            correctIndex: 1,
+            analysis: "Regression analysis establishes statistical relationships between past independent and dependent variables to forecast future results."
+        },
+        {
+            question: "\"A model constructed to represent reality, on which conclusions about real-life problems can be used\" defines what?",
+            options: [
+                "Simulation",
+                "Statistical Decision Theory",
+                "Network Diagram",
+                "Back Order Model"
+            ],
+            correctIndex: 0,
+            analysis: "Simulation creates a functional representation of reality to test solutions to complex problems safely."
+        },
+        {
+            question: "\"A quantitative technique used to produce an optimum solution within the bounds imposed by constraints upon the decision\" defines what?",
+            options: [
+                "Linear Programming",
+                "Queuing Theory",
+                "Regression Analysis",
+                "PERT"
+            ],
+            correctIndex: 0,
+            analysis: "Linear programming finds the optimal allocation of resources (max profit, min cost) under given mathematical constraints."
+        },
+        {
+            question: "\"A quantitative technique where samples of populations are statistically determined for processes like quality control and market research\" defines what?",
+            options: [
+                "Sampling Theory",
+                "Queuing Theory",
+                "Simulation",
+                "Critical Path Method"
+            ],
+            correctIndex: 0,
+            analysis: "Sampling theory uses statistical principles to evaluate subset data to infer trends about an entire population."
+        },
+        {
+            question: "\"The rational way to conceptualize, analyze, and solve problems in situations involving limited or partial information about the decision environment\" defines what?",
+            options: [
+                "Statistical Decision Theory",
+                "Qualitative Assessment",
+                "Linear Programming",
+                "Simulation"
+            ],
+            correctIndex: 0,
+            analysis: "Statistical Decision Theory provides a structured framework for making rational choices under partial uncertainty."
+        }
+    ];
+
+    const TOTAL = keyData.length;
+    let score = 0;
+    let answered = 0;
+
+    function shuffle(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function init() {
+        document.querySelectorAll('.total-count').forEach(el => el.textContent = TOTAL);
+        const container = document.getElementById('quiz-container');
+        const shuffledQuestions = shuffle(keyData);
+
+        shuffledQuestions.forEach((q, idx) => {
+            let options = q.options.map((opt, i) => ({ text: opt, correct: i === q.correctIndex }));
+            options = shuffle(options);
+
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.id = `q-${idx}`;
+
+            const labels = ['A', 'B', 'C', 'D'];
+            let optsHTML = '';
+            options.forEach((opt, cIdx) => {
+                optsHTML += `<div class="option" data-correct="${opt.correct}" onclick="check('q-${idx}', this)">${labels[cIdx]}. ${opt.text}</div>`;
+            });
+
+            card.innerHTML = `
+                <div class="question-text">${idx + 1}. ${q.question}</div>
+                <div class="options-list">${optsHTML}</div>
+                <div class="analysis-box">
+                    <div class="analysis-title">AI Analysis</div>
+                    <p class="analysis-text">${q.analysis}</p>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function check(cardId, selectedOpt) {
+        const card = document.getElementById(cardId);
+        if (card.getAttribute('data-answered') === 'true') return;
+        card.setAttribute('data-answered', 'true');
+
+        const isCorrect = selectedOpt.getAttribute('data-correct') === 'true';
+        const options = card.querySelectorAll('.option');
+
+        options.forEach(opt => {
+            opt.classList.add('disabled');
+            const optCorrect = opt.getAttribute('data-correct') === 'true';
+            if (opt === selectedOpt) {
+                if (isCorrect) {
+                    opt.classList.add('correct');
+                    opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+                    score++;
+                } else {
+                    opt.classList.add('wrong');
+                    opt.innerHTML += ` <span class="status-tag wrong-tag">✕ Your answer</span>`;
+                }
+            } else if (optCorrect) {
+                opt.classList.add('correct');
+                opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+            }
+        });
+
+        card.querySelector('.analysis-box').style.display = 'block';
+        answered++;
+        document.getElementById('score-counter').textContent = score;
+        document.getElementById('answered-counter').textContent = answered;
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>

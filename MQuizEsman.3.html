@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management & Planning Master Quiz</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --correct-bg: rgba(46, 160, 67, 0.15);
+            --correct-border: #2ea043;
+            --correct-text: #3fb950;
+            --wrong-bg: rgba(248, 81, 73, 0.15);
+            --wrong-border: #f85149;
+            --wrong-text: #ff7b72;
+            --analysis-bg: #1c2128;
+            --accent-blue: #58a6ff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 25px;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-box {
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .score-box { color: var(--correct-text); }
+        .answered-box { color: var(--accent-blue); }
+
+        .section-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin: 35px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #30363d;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: var(--option-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .option:not(.disabled):hover {
+            background-color: var(--option-hover);
+        }
+
+        .option.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--text-main);
+        }
+
+        .option.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--text-main);
+        }
+
+        .option.disabled { cursor: default; }
+
+        .status-tag {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .status-tag.correct-tag { color: var(--correct-text); }
+        .status-tag.wrong-tag { color: var(--wrong-text); }
+
+        .analysis-box {
+            margin-top: 15px;
+            background-color: var(--analysis-bg);
+            border-radius: 8px;
+            padding: 14px;
+            border-left: 3px solid var(--accent-blue);
+            display: none;
+        }
+
+        .analysis-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 6px;
+        }
+
+        .analysis-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        textarea.enum-input {
+            width: 100%;
+            height: 120px;
+            background-color: var(--option-bg);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 12px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+
+        textarea.enum-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .submit-btn {
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .submit-btn:hover { background-color: #2ea043; }
+        .submit-btn:disabled { background-color: #30363d; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">Management & Planning Master Quiz</h1>
+        <div class="stats-bar">
+            <div class="stat-box score-box">Score: <span id="score-counter">0</span> / <span id="total-count">0</span></div>
+            <div class="stat-box answered-box">Answered: <span id="answered-counter">0</span> / <span id="total-count-ans">0</span></div>
+        </div>
+    </div>
+
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+    // Test I: Definitions (Difficult, plausible options from the same domain)
+    const definitionsData = [
+        {
+            question: "What is defined as the management function involving the anticipation of future trends and determining the best strategies and tactics to achieve organizational objectives?",
+            options: ["Planning (Management Function)", "Operational Control", "Strategic Decision Execution", "Planning (Technical Activities)"],
+            correctIndex: 0,
+            analysis: "According to the course material, Planning as a management function focuses on anticipating future trends and selecting strategies/tactics to meet objectives."
+        },
+        {
+            question: "Which process is defined as the selection and sequential ordering of tasks required to achieve an organizational goal?",
+            options: ["Planning (Technical Activities)", "Operational Tasking", "Workforce Allocation", "Intermediate Planning"],
+            correctIndex: 0,
+            analysis: "Technical activities define planning specifically around the selection and sequential ordering of required tasks."
+        },
+        {
+            question: "Which planning process involves organizational leaders defining their vision for the future, identifying goals/objectives, and establishing their sequence of realization?",
+            options: ["Strategic Planning", "Operational Planning", "Intermediate Planning", "Tactical Execution"],
+            correctIndex: 0,
+            analysis: "Strategic planning is undertaken by top management to set long-term vision, goals, and their sequence of execution."
+        },
+        {
+            question: "What form of planning evaluates available financial, human, and material resources to plan for a period of six months to two years in advance?",
+            options: ["Intermediate Planning", "Strategic Planning", "Operational Planning", "Short-Range Planning"],
+            correctIndex: 0,
+            analysis: "Intermediate planning is conducted by middle management for a timeframe of six months to two years."
+        },
+        {
+            question: "Which future-oriented process maps out department goals, capabilities, and budgets as a result of a team working to execute a strategic plan?",
+            options: ["Operational Planning", "Intermediate Planning", "Strategic Alignment", "Single-Use Planning"],
+            correctIndex: 0,
+            analysis: "Operational planning is executed at the lower management/department level to support the overarching strategic plan."
+        },
+        {
+            question: "How are plans classified if they are intended to cover a period of less than one year and are primarily handled by first-line supervisors?",
+            options: ["Short-Range Plans", "Standing Plans", "Operational Procedures", "Single-Use Plans"],
+            correctIndex: 0,
+            analysis: "Short-range plans cover time spans under one year and fall under the responsibility of first-line supervisors."
+        },
+        {
+            question: "How are plans classified if they cover a time span of more than one year and are mostly undertaken by middle and top management?",
+            options: ["Long-Range Plans", "Standing Plans", "Strategic Policy Plans", "Intermediate Plans"],
+            correctIndex: 0,
+            analysis: "Long-range plans extend beyond one year and are driven by middle and top management levels."
+        },
+        {
+            question: "What type of plans are used again and again, focusing on managerial situations that recur repeatedly?",
+            options: ["Standing Plans", "Single-Use Plans", "Functional Plans", "Operational Plans"],
+            correctIndex: 0,
+            analysis: "Standing plans are recurring guidelines designed for ongoing, repetitive management scenarios."
+        },
+        {
+            question: "What are broad guidelines intended to aid managers at every level in making decisions about recurring situations or functions?",
+            options: ["Policies", "Procedures", "Rules", "Programs"],
+            correctIndex: 0,
+            analysis: "Policies serve as broad decision-making parameters for recurring conditions across all management levels."
+        },
+        {
+            question: "Which plans describe the exact series of actions to be taken in a given situation?",
+            options: ["Procedures", "Policies", "Rules", "Tactics"],
+            correctIndex: 0,
+            analysis: "Procedures outline the mandatory step-by-step sequence of actions required in specific circumstances."
+        },
+        {
+            question: "What are explicit statements that either require or forbid a specific action?",
+            options: ["Rules", "Policies", "Procedures", "Directives"],
+            correctIndex: 0,
+            analysis: "Rules are strict, non-discretionary statements detailing mandatory or prohibited conduct."
+        },
+        {
+            question: "What type of plans are specifically developed to implement courses of action that are relatively unique and unlikely to be repeated?",
+            options: ["Single-Use Plans", "Standing Plans", "Operational Plans", "Short-Range Plans"],
+            correctIndex: 0,
+            analysis: "Single-use plans are tailor-made for specific, non-recurring projects or events."
+        },
+        {
+            question: "According to Weston and Brigham, what is defined as a plan setting forth projected expenditure for a certain activity and explaining the origin of required funds?",
+            options: ["Budget", "Financial Plan", "Capital Forecast", "Pro Forma Statement"],
+            correctIndex: 0,
+            analysis: "Weston and Brigham specifically define a budget as a single-use plan mapping projected expenditures and funding sources."
+        },
+        {
+            question: "What single-use plan is specifically designed to coordinate a large set of activities?",
+            options: ["Program", "Project", "Procedure", "Strategy"],
+            correctIndex: 0,
+            analysis: "A program is a broad single-use plan designed to manage and coordinate a large array of activities."
+        },
+        {
+            question: "What single-use plan is limited in scope compared to a program and is sometimes prepared to support a program?",
+            options: ["Project", "Task Unit", "Tactical Action Plan", "Operational Procedure"],
+            correctIndex: 0,
+            analysis: "A project is narrower in scope than a program and often serves as a modular building block of a program."
+        },
+        {
+            question: "What written document serves as the blueprint for implementing and controlling an organization's marketing activities related to specific strategies?",
+            options: ["Marketing Plan", "Production Plan", "Commercial Strategy Plan", "Functional Area Plan"],
+            correctIndex: 0,
+            analysis: "A marketing plan details and controls marketing operations and strategic execution."
+        },
+        {
+            question: "What written document states the quantity of output a company must produce in broad terms and by product family?",
+            options: ["Production Plan", "Operational Budget", "Capacity Allocation Plan", "Material Requirements Plan"],
+            correctIndex: 0,
+            analysis: "A production plan outlines mandatory manufacturing outputs overall and across product families."
+        },
+        {
+            question: "Which document summarizes the current financial situation of a firm, analyzes financial needs, and recommends a direction for financial activities?",
+            options: ["Financial Plan", "Pro Forma Analysis", "Cash Budget", "Annual Report"],
+            correctIndex: 0,
+            analysis: "A financial plan synthesizes current financial status, future requirements, and overall monetary guidance."
+        },
+        {
+            question: "What document indicates the human resource needs of a company detailed in terms of quantity and quality based on strategic goals?",
+            options: ["Human Resource Management Plan", "Workforce Development Plan", "Operational Staffing Plan", "Organizational Chart"],
+            correctIndex: 0,
+            analysis: "An HR Management Plan maps workforce requirements (both numerical and skill-based) against strategic objectives."
+        }
+    ];
+
+    // Test II: Situational Applications (5 per category)
+    const situationalData = [
+        // Category: Standing vs Single-Use Plans (5 items)
+        {
+            question: "A company adopts a mandatory rule that all employees must wear safety goggles when entering the production floor. What type of plan does this scenario describe?",
+            options: ["Standing Plan (Rule)", "Single-Use Plan (Project)", "Standing Plan (Policy)", "Single-Use Plan (Program)"],
+            correctIndex: 0,
+            analysis: "Safety protocols are recurring enforcement rules that apply indefinitely, making them a Standing Plan (specifically a Rule)."
+        },
+        {
+            question: "A tech startup creates a detailed financial plan and activity schedule for its upcoming one-time product launch event in Q3. What classification does this plan fall under?",
+            options: ["Single-Use Plan (Program)", "Standing Plan (Procedure)", "Standing Plan (Policy)", "Single-Use Plan (Budget)"],
+            correctIndex: 0,
+            analysis: "A product launch event is a unique, non-repetitive course of action coordinating multiple activities, defining a Single-Use Plan (Program)."
+        },
+        {
+            question: "An organization establishes a step-by-step guideline that HR must follow every time an employee submits a resignation. What plan type is being utilized?",
+            options: ["Standing Plan (Procedure)", "Single-Use Plan (Program)", "Standing Plan (Policy)", "Single-Use Plan (Project)"],
+            correctIndex: 0,
+            analysis: "A standardized step-by-step sequence of actions for a recurring event is a Standing Plan (Procedure)."
+        },
+        {
+            question: "A municipal government drafts a dedicated financial expenditure document for constructing a single bridge over the local river. How is this plan classified?",
+            options: ["Single-Use Plan (Project/Budget)", "Standing Plan (Policy)", "Standing Plan (Procedure)", "Operational Rule"],
+            correctIndex: 0,
+            analysis: "Constructing a specific bridge is a unique, limited-scope task with a dedicated funding blueprint, making it a Single-Use Plan."
+        },
+        {
+            question: "A corporation issues a broad statement declaring that all purchasing decisions must prioritize environmentally sustainable vendors. What type of plan is this?",
+            options: ["Standing Plan (Policy)", "Standing Plan (Procedure)", "Single-Use Plan (Program)", "Standing Plan (Rule)"],
+            correctIndex: 0,
+            analysis: "This is a broad decision-making guideline for recurring purchasing decisions across the firm, which defines a Policy under Standing Plans."
+        },
+
+        // Category: Planning by Management Level (5 items)
+        {
+            question: "The Board of Directors and Chief Executive Officer gather to redefine the firm's 10-year corporate vision and global market expansion strategy. Which management level of planning is occurring?",
+            options: ["Top Management Level (Strategic Planning)", "Middle Management Level (Intermediate Planning)", "Lower Management Level (Operational Planning)", "Functional Supervision"],
+            correctIndex: 0,
+            analysis: "Setting long-term corporate vision and high-level expansion strategy is the exclusive role of Top Management (Strategic Planning)."
+        },
+        {
+            question: "A regional plant manager allocates human and material resources across departments for an upcoming 18-month production expansion. Which planning level does this represent?",
+            options: ["Middle Management Level (Intermediate Planning)", "Top Management Level (Strategic Planning)", "Lower Management Level (Operational Planning)", "First-Line Execution"],
+            correctIndex: 0,
+            analysis: "Managing resource allocations over a 6-month to 2-year timeframe is handled by Middle Managers (Intermediate Planning)."
+        },
+        {
+            question: "A shift supervisor creates weekly work schedules and daily target quotas for assembly line workers. Which planning level is being exercised?",
+            options: ["Lower Management Level (Operational Planning)", "Middle Management Level (Intermediate Planning)", "Top Management Level (Strategic Planning)", "Corporate Policy Planning"],
+            correctIndex: 0,
+            analysis: "Daily/weekly scheduling and execution of department tasks fall under Lower Management / First-Line Supervision (Operational Planning)."
+        },
+        {
+            question: "A Vice President of Marketing develops a 1-year functional strategy to increase brand awareness across three provinces. What planning level is this activity?",
+            options: ["Middle Management Level (Intermediate Planning)", "Lower Management Level (Operational Planning)", "Top Management Level (Strategic Planning)", "First-Line Supervision"],
+            correctIndex: 0,
+            analysis: "Functional area planning spanning up to a year to support corporate goals is conducted by Middle Management."
+        },
+        {
+            question: "A software dev team leader maps out the team's sprint backlog, daily standup schedules, and immediate feature deliverables for the month. Which management level is conducting this?",
+            options: ["Lower Management Level (Operational Planning)", "Middle Management Level (Intermediate Planning)", "Top Management Level (Strategic Planning)", "Executive Planning"],
+            correctIndex: 0,
+            analysis: "Sprint execution, local team targets, and immediate output capabilities represent Operational Planning by Lower Management."
+        },
+
+        // Category: Plans by Time Horizon (5 items)
+        {
+            question: "An operations manager drafts a 90-day maintenance checklist to ensure factory machinery operates smoothly over the next quarter. How is this plan categorized by time horizon?",
+            options: ["Short-Range Plan", "Long-Range Plan", "Strategic Plan", "Intermediate Multi-Year Plan"],
+            correctIndex: 0,
+            analysis: "Plans spanning less than one year (like a 90-day schedule) are Short-Range Plans."
+        },
+        {
+            question: "A multi-national bank formulates a 5-year digital transformation blueprint to migrate all legacy systems to the cloud. What time horizon classification applies?",
+            options: ["Long-Range Plan", "Short-Range Plan", "Operational Plan", "Standing Procedure"],
+            correctIndex: 0,
+            analysis: "Plans extending beyond one year (in this case 5 years) are Long-Range Plans."
+        },
+        {
+            question: "A store manager sets up a 3-month sales promotion campaign for the holiday season. What time horizon plan is being executed?",
+            options: ["Short-Range Plan", "Long-Range Plan", "Strategic Vision Plan", "Standing Corporate Policy"],
+            correctIndex: 0,
+            analysis: "A 3-month promotional campaign is under the 1-year threshold, making it a Short-Range Plan."
+        },
+        {
+            question: "A university governing board creates a 3-year campus facility development roadmap. Which time horizon category does this document fit?",
+            options: ["Long-Range Plan", "Short-Range Plan", "Tactical Operational Schedule", "Single-Use Budget Procedure"],
+            correctIndex: 0,
+            analysis: "Roadmaps spanning more than one year are classified as Long-Range Plans."
+        },
+        {
+            question: "A supervisor issues a bi-weekly task assignment matrix for warehouse inventory stocking. What is the time horizon classification?",
+            options: ["Short-Range Plan", "Long-Range Plan", "Strategic Roadmap", "Intermediate Horizon Plan"],
+            correctIndex: 0,
+            analysis: "A bi-weekly operational schedule covers less than one year, classifying it as a Short-Range Plan."
+        }
+    ];
+
+    // Test III: Identification (Master Enumeration)
+    const enumerationQuestions = [
+        {
+            question: "Enumerate the steps in the Planning Process.",
+            answers: [
+                "setting organizational, divisional, or unit goals",
+                "developing strategies or tactics",
+                "determining resources needed",
+                "setting standards"
+            ],
+            explanation: "The 4 steps in the Planning Process are: 1. Setting Organizational, Divisional, or Unit Goals, 2. Developing Strategies or Tactics, 3. Determining Resources Needed, 4. Setting Standards."
+        },
+        {
+            question: "Enumerate the general Types of Plans according to classification.",
+            answers: [
+                "plans with time horizon",
+                "plan according to frequency of use",
+                "functional area plans"
+            ],
+            explanation: "The 3 general Types of Plans are: 1. Plans with time horizon, 2. Plan according to frequency of use, 3. Functional area plans."
+        },
+        {
+            question: "Enumerate the sub-types of Standing Plans.",
+            answers: [
+                "policies",
+                "procedures",
+                "rules"
+            ],
+            explanation: "Standing plans are further classified into: 1. Policies, 2. Procedures, 3. Rules."
+        },
+        {
+            question: "Enumerate the sub-types of Single-Use Plans.",
+            answers: [
+                "budget",
+                "program",
+                "project"
+            ],
+            explanation: "Single-use plans are classified into: 1. Budget, 2. Program, 3. Project."
+        },
+        {
+            question: "Enumerate the Functional Area Plans specified in the course.",
+            answers: [
+                "marketing plan",
+                "production plan",
+                "financial plan",
+                "human resource management plan"
+            ],
+            explanation: "The 4 functional area plans are: 1. Marketing Plan, 2. Production Plan, 3. Financial Plan, 4. Human Resource Management Plan."
+        },
+        {
+            question: "Enumerate the Contents of a Marketing Plan.",
+            answers: [
+                "situational and target market",
+                "marketing objectives and goals",
+                "marketing strategies",
+                "marketing tactics",
+                "schedule and budgets",
+                "financial data and control"
+            ],
+            explanation: "Marketing Plan contents include: 1. Situational and target market, 2. Marketing objectives and goals, 3. Marketing strategies, 4. Marketing tactics, 5. Schedule and budgets, 6. Financial data and control."
+        },
+        {
+            question: "Enumerate the Contents of a Production Plan.",
+            answers: [
+                "amount of capacity the company must have",
+                "how many employees are required",
+                "how much material should be purchased"
+            ],
+            explanation: "Production Plan contents include: 1. Amount of capacity the company must have, 2. How many employees are required, 3. How much material should be purchased."
+        },
+        {
+            question: "Enumerate the Contents of a Financial Plan.",
+            answers: [
+                "an analysis of the firm's current condition as indicated by an analysis of the most recent statements",
+                "a sales forecast",
+                "capital budget",
+                "the cash budget",
+                "a set of pro forma financial statements",
+                "the external financing plan"
+            ],
+            // Flexible matching terms for long financial plan items
+            altAnswers: [
+                ["analysis of firm current condition", "analysis of current condition", "firm current condition analysis"],
+                ["sales forecast", "a sales forecast"],
+                ["capital budget"],
+                ["cash budget", "the cash budget"],
+                ["pro forma financial statements", "set of pro forma financial statements", "pro forma statements"],
+                ["external financing plan", "the external financing plan"]
+            ],
+            explanation: "Financial Plan contents include: 1. Analysis of firm's current condition, 2. Sales forecast, 3. Capital budget, 4. Cash budget, 5. Pro forma financial statements, 6. External financing plan."
+        },
+        {
+            question: "Enumerate the Parts of a Strategic Plan.",
+            answers: [
+                "company objective or mission",
+                "corporate goals",
+                "strategies"
+            ],
+            explanation: "Parts of a Strategic Plan are: 1. Company objective or mission, 2. Corporate goals, 3. Strategies."
+        },
+        {
+            question: "Enumerate the factors contributing to Effective Planning.",
+            answers: [
+                "manager's ability to plan",
+                "commitment to planning process",
+                "proper information",
+                "focus on goals",
+                "decision making"
+            ],
+            explanation: "Factors for Effective Planning are: 1. Manager's ability to plan, 2. Commitment to planning process, 3. Proper information, 4. Focus on goals, 5. Decision making."
+        }
+    ];
+
+    let score = 0;
+    let answered = 0;
+
+    function shuffle(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function initQuiz() {
+        const container = document.getElementById('quiz-container');
+
+        const test1 = shuffle(definitionsData);
+        const test2 = shuffle(situationalData);
+        const test3 = shuffle(enumerationQuestions);
+
+        const totalQuestions = test1.length + test2.length + test3.length;
+        document.getElementById('total-count').textContent = totalQuestions;
+        document.getElementById('total-count-ans').textContent = totalQuestions;
+
+        let globalIndex = 1;
+
+        // Render Test I
+        appendSectionHeader(container, "Test I: Definitions & Core Concepts");
+        test1.forEach(q => renderMCQ(q, container, globalIndex++));
+
+        // Render Test II
+        appendSectionHeader(container, "Test II: Situational Applications");
+        test2.forEach(q => renderMCQ(q, container, globalIndex++));
+
+        // Render Test III
+        appendSectionHeader(container, "Test III: Master Enumeration (Identification)");
+        test3.forEach(q => renderIdentification(q, container, globalIndex++));
+    }
+
+    function appendSectionHeader(container, text) {
+        const h = document.createElement('div');
+        h.className = 'section-header';
+        h.textContent = text;
+        container.appendChild(h);
+    }
+
+    function renderMCQ(q, container, idx) {
+        let options = q.options.map((opt, i) => ({ text: opt, correct: i === q.correctIndex }));
+        options = shuffle(options);
+
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `q-${idx}`;
+
+        const labels = ['A', 'B', 'C', 'D'];
+        let optsHTML = '';
+        options.forEach((opt, cIdx) => {
+            optsHTML += `<div class="option" data-correct="${opt.correct}" onclick="checkMCQ('q-${idx}', this)">${labels[cIdx]}. ${opt.text}</div>`;
+        });
+
+        card.innerHTML = `
+            <div class="question-text">${idx}. ${q.question}</div>
+            <div class="options-list">${optsHTML}</div>
+            <div class="analysis-box">
+                <div class="analysis-title">Explanation</div>
+                <p class="analysis-text">${q.analysis}</p>
+            </div>
+        `;
+        container.appendChild(card);
+    }
+
+    function checkMCQ(cardId, selectedOpt) {
+        const card = document.getElementById(cardId);
+        if (card.getAttribute('data-answered') === 'true') return;
+        card.setAttribute('data-answered', 'true');
+
+        const isCorrect = selectedOpt.getAttribute('data-correct') === 'true';
+        const options = card.querySelectorAll('.option');
+
+        options.forEach(opt => {
+            opt.classList.add('disabled');
+            const optCorrect = opt.getAttribute('data-correct') === 'true';
+            if (opt === selectedOpt) {
+                if (isCorrect) {
+                    opt.classList.add('correct');
+                    opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+                    score++;
+                } else {
+                    opt.classList.add('wrong');
+                    opt.innerHTML += ` <span class="status-tag wrong-tag">✕ Your answer</span>`;
+                }
+            } else if (optCorrect) {
+                opt.classList.add('correct');
+                opt.innerHTML += ` <span class="status-tag correct-tag">✓ Correct answer</span>`;
+            }
+        });
+
+        card.querySelector('.analysis-box').style.display = 'block';
+        answered++;
+        updateStats();
+    }
+
+    function renderIdentification(q, container, idx) {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `q-${idx}`;
+
+        card.innerHTML = `
+            <div class="question-text">${idx}. ${q.question}</div>
+            <textarea class="enum-input" id="input-${idx}" placeholder="Enter each item on a new line (any order)..."></textarea>
+            <button class="submit-btn" id="btn-${idx}" onclick="checkIdentification(${idx}, ${JSON.stringify(q.answers).replace(/"/g, '&quot;')}, ${q.altAnswers ? JSON.stringify(q.altAnswers).replace(/"/g, '&quot;') : 'null'})">Submit Answer</button>
+            <div class="analysis-box" id="analysis-${idx}">
+                <div class="analysis-title">Enumeration Key & Explanation</div>
+                <p class="analysis-text">${q.explanation}</p>
+            </div>
+        `;
+        container.appendChild(card);
+    }
+
+    function checkIdentification(idx, targetAnswers, altAnswers) {
+        const card = document.getElementById(`q-${idx}`);
+        if (card.getAttribute('data-answered') === 'true') return;
+
+        const inputEl = document.getElementById(`input-${idx}`);
+        const btn = document.getElementById(`btn-${idx}`);
+        const userLines = inputEl.value
+            .split('\n')
+            .map(l => l.trim().toLowerCase())
+            .filter(l => l.length > 0);
+
+        card.setAttribute('data-answered', 'true');
+        inputEl.disabled = true;
+        btn.disabled = true;
+
+        const requiredCount = targetAnswers.length;
+        let isFullyCorrect = false;
+
+        // Check if length matches exactly (no excess, no lack)
+        if (userLines.length === requiredCount) {
+            let matched = 0;
+            let targetCopy = [...targetAnswers];
+
+            userLines.forEach(line => {
+                let foundIdx = -1;
+
+                // Exact substring/includes match
+                targetCopy.forEach((t, i) => {
+                    if (t.toLowerCase() === line || t.toLowerCase().includes(line) || line.includes(t.toLowerCase())) {
+                        foundIdx = i;
+                    }
+                });
+
+                // Alternative flexible matches if provided
+                if (foundIdx === -1 && altAnswers) {
+                    altAnswers.forEach((altGroup, i) => {
+                        altGroup.forEach(alt => {
+                            if (alt.toLowerCase() === line || line.includes(alt.toLowerCase())) {
+                                foundIdx = i;
+                            }
+                        });
+                    });
+                }
+
+                if (foundIdx !== -1) {
+                    matched++;
+                    targetCopy.splice(foundIdx, 1);
+                }
+            });
+
+            if (matched === requiredCount) {
+                isFullyCorrect = true;
+            }
+        }
+
+        const analysisBox = document.getElementById(`analysis-${idx}`);
+        const statusSpan = document.createElement('div');
+
+        if (isFullyCorrect) {
+            score++;
+            statusSpan.className = 'status-tag correct-tag';
+            statusSpan.style.fontSize = '1rem';
+            statusSpan.style.marginBottom = '10px';
+            statusSpan.innerHTML = '✓ Perfect! All items enumerated correctly.';
+        } else {
+            statusSpan.className = 'status-tag wrong-tag';
+            statusSpan.style.fontSize = '1rem';
+            statusSpan.style.marginBottom = '10px';
+            if (userLines.length !== requiredCount) {
+                statusSpan.innerHTML = `✕ Incorrect quantity (Provided ${userLines.length} items). Any excess, missing, or wrong entry invalidates the answer.`;
+            } else {
+                statusSpan.innerHTML = '✕ Incorrect or incomplete enumeration details.';
+            }
+        }
+
+        analysisBox.insertBefore(statusSpan, analysisBox.firstChild);
+        analysisBox.style.display = 'block';
+
+        answered++;
+        updateStats();
+    }
+
+    function updateStats() {
+        document.getElementById('score-counter').textContent = score;
+        document.getElementById('answered-counter').textContent = answered;
+    }
+
+    window.onload = initQuiz;
+</script>
+</body>
+</html>
