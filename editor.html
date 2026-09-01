@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSCE 2A-1 Quiz Structure Manager</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --accent-blue: #58a6ff;
+            --accent-green: #238636;
+            --accent-red: #da3633;
+            --border-color: #30363d;
+            --selected-border: #58a6ff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
+
+        /* Split Screen Layout */
+        .editor-pane, .output-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 0;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--accent-blue);
+        }
+
+        /* Toolbar Actions */
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Dynamic Tree Editor Container */
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            max-height: calc(100vh - 140px);
+            padding-right: 5px;
+        }
+
+        /* Selection Block Rules */
+        .block {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .block:hover {
+            border-color: var(--option-hover);
+        }
+
+        .block.selected {
+            border-color: var(--selected-border);
+            box-shadow: 0 0 8px rgba(88, 166, 255, 0.2);
+        }
+
+        /* Block Type Variations */
+        .block-main {
+            border-left: 5px solid var(--accent-blue);
+        }
+
+        .block-sub {
+            margin-left: 20px;
+            border-left: 5px solid #a371f7;
+            background-color: #1a1f29;
+        }
+
+        .block-quiz {
+            margin-left: 40px;
+            border-left: 5px solid var(--accent-green);
+            background-color: var(--option-bg);
+        }
+
+        /* Auto-expanding Inputs */
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .quiz-split {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .quiz-split-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--option-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover { background-color: var(--option-hover); }
+        .btn-green { background-color: var(--accent-green); color: white; border: none; }
+        .btn-green:hover { background-color: #2ea043; }
+        .btn-red { background-color: var(--accent-red); color: white; border: none; }
+        .btn-red:hover { background-color: #f85149; }
+
+        /* Code View & Live Preview */
+        textarea {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background-color: var(--option-bg);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Left Column: Block Editor -->
+<div class="editor-pane">
+    <div class="panel-header">
+        <h2 class="panel-title">Structure Builder</h2>
+        <button class="btn btn-green" onclick="addMainFolder()">+ Main Folder</button>
+    </div>
+
+    <div class="action-bar">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Active Actions:</span>
+        <button class="btn" id="btn-add-sub" disabled onclick="addSubFolder()">+ Add Subfolder</button>
+        <button class="btn" id="btn-add-quiz" disabled onclick="addQuiz()">+ Add Quiz</button>
+        <button class="btn btn-red" id="btn-delete" disabled onclick="deleteSelected()" style="margin-left: auto;">Delete</button>
+    </div>
+
+    <div class="tree-container" id="tree-root">
+        <!-- Dynamic blocks will generate here -->
+    </div>
+</div>
+
+<!-- Right Column: Code & Copy -->
+<div class="output-pane">
+    <div class="panel-header">
+        <h2 class="panel-title">Generated HTML Source</h2>
+        <button class="btn btn-green" onclick="copyHTML()">Copy Source Code</button>
+    </div>
+    <textarea id="html-output" readonly></textarea>
+</div>
+
+<script>
+    // Data State loaded from your original snippet structure
+    let treeData = [
+        {
+            id: generateId(),
+            name: "PRELIM",
+            subfolders: [
+                {
+                    id: generateId(),
+                    name: "THEOLOGY 103",
+                    quizzes: [
+                        { id: generateId(), name: "Theo.1.11", url: "MQuizTheo.1.11.Complete.html" },
+                        { id: generateId(), name: "Theo1.12", url: "MQuizTheo.1.12.html" },
+                        { id: generateId(), name: "Theo.2.11", url: "MQuizTheo.2.11Complete.html" },
+                        { id: generateId(), name: "Theo.2.12", url: "MQuizTheo.2.12.html" }
+                    ]
+                },
+                {
+                    id: generateId(),
+                    name: "GEC 105",
+                    quizzes: [
+                        { id: generateId(), name: "GEC105.2", url: "MQuizGec105.2.Complete.html" },
+                        { id: generateId(), name: "GEC105.4", url: "MQuizGec105.4.Complete.html" }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    let selectedId = null;
+    let selectedType = null; // 'main', 'sub', or 'quiz'
+
+    function generateId() {
+        return 'id_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // Render tree UI
+    function renderTree() {
+        const container = document.getElementById('tree-root');
+        container.innerHTML = '';
+
+        treeData.forEach(main => {
+            // Main Folder Block
+            const mainEl = document.createElement('div');
+            mainEl.className = `block block-main ${selectedId === main.id ? 'selected' : ''}`;
+            mainEl.onclick = (e) => { e.stopPropagation(); selectBlock(main.id, 'main'); };
+            
+            mainEl.innerHTML = `
+                <div class="input-row">
+                    <span class="badge">Main</span>
+                    <input type="text" value="${escapeHtml(main.name)}" placeholder="Main Folder Name (e.g., PRELIM)" oninput="updateMainName('${main.id}', this.value)">
+                </div>
+            `;
+            container.appendChild(mainEl);
+
+            // Subfolders
+            main.subfolders.forEach(sub => {
+                const subEl = document.createElement('div');
+                subEl.className = `block block-sub ${selectedId === sub.id ? 'selected' : ''}`;
+                subEl.onclick = (e) => { e.stopPropagation(); selectBlock(sub.id, 'sub'); };
+
+                subEl.innerHTML = `
+                    <div class="input-row">
+                        <span class="badge">Sub</span>
+                        <input type="text" value="${escapeHtml(sub.name)}" placeholder="Subject Code (e.g., THEOLOGY 103)" oninput="updateSubName('${main.id}', '${sub.id}', this.value)">
+                    </div>
+                `;
+                container.appendChild(subEl);
+
+                // Quizzes
+                sub.quizzes.forEach(quiz => {
+                    const quizEl = document.createElement('div');
+                    quizEl.className = `block block-quiz ${selectedId === quiz.id ? 'selected' : ''}`;
+                    quizEl.onclick = (e) => { e.stopPropagation(); selectBlock(quiz.id, 'quiz'); };
+
+                    quizEl.innerHTML = `
+                        <div class="quiz-split">
+                            <span class="badge">Quiz Link</span>
+                            <div class="quiz-split-inputs">
+                                <input type="text" value="${escapeHtml(quiz.name)}" placeholder="Quiz Name" oninput="updateQuiz('${main.id}', '${sub.id}', '${quiz.id}', 'name', this.value)">
+                                <input type="text" value="${escapeHtml(quiz.url)}" placeholder="Target HTML File (.html)" oninput="updateQuiz('${main.id}', '${sub.id}', '${quiz.id}', 'url', this.value)">
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(quizEl);
+                });
+            });
+        });
+
+        updateToolbar();
+        generateOutputHTML();
+    }
+
+    function selectBlock(id, type) {
+        selectedId = id;
+        selectedType = type;
+        renderTree();
+    }
+
+    function updateToolbar() {
+        const addSubBtn = document.getElementById('btn-add-sub');
+        const addQuizBtn = document.getElementById('btn-add-quiz');
+        const deleteBtn = document.getElementById('btn-delete');
+
+        addSubBtn.disabled = selectedType !== 'main';
+        addQuizBtn.disabled = selectedType !== 'sub';
+        deleteBtn.disabled = !selectedId;
+    }
+
+    // CRUD State Actions
+    function addMainFolder() {
+        const newMain = { id: generateId(), name: "NEW FOLDER", subfolders: [] };
+        treeData.push(newMain);
+        selectBlock(newMain.id, 'main');
+    }
+
+    function addSubFolder() {
+        if (selectedType !== 'main') return;
+        const main = treeData.find(m => m.id === selectedId);
+        if (main) {
+            const newSub = { id: generateId(), name: "NEW SUBJECT", quizzes: [] };
+            main.subfolders.push(newSub);
+            selectBlock(newSub.id, 'sub');
+        }
+    }
+
+    function addQuiz() {
+        if (selectedType !== 'sub') return;
+        for (let main of treeData) {
+            const sub = main.subfolders.find(s => s.id === selectedId);
+            if (sub) {
+                const newQuiz = { id: generateId(), name: "New Quiz Link", url: "quiz_file.html" };
+                sub.quizzes.push(newQuiz);
+                selectBlock(newQuiz.id, 'quiz');
+                break;
+            }
+        }
+    }
+
+    function deleteSelected() {
+        if (!selectedId) return;
+
+        treeData = treeData.filter(m => m.id !== selectedId);
+        treeData.forEach(m => {
+            m.subfolders = m.subfolders.filter(s => s.id !== selectedId);
+            m.subfolders.forEach(s => {
+                s.quizzes = s.quizzes.filter(q => q.id !== selectedId);
+            });
+        });
+
+        selectedId = null;
+        selectedType = null;
+        renderTree();
+    }
+
+    // Direct text mutation listeners
+    function updateMainName(mainId, val) {
+        const main = treeData.find(m => m.id === mainId);
+        if (main) main.name = val;
+        generateOutputHTML();
+    }
+
+    function updateSubName(mainId, subId, val) {
+        const main = treeData.find(m => m.id === mainId);
+        if (main) {
+            const sub = main.subfolders.find(s => s.id === subId);
+            if (sub) sub.name = val;
+        }
+        generateOutputHTML();
+    }
+
+    function updateQuiz(mainId, subId, quizId, key, val) {
+        const main = treeData.find(m => m.id === mainId);
+        if (main) {
+            const sub = main.subfolders.find(s => s.id === subId);
+            if (sub) {
+                const quiz = sub.quizzes.find(q => q.id === quizId);
+                if (quiz) quiz[key] = val;
+            }
+        }
+        generateOutputHTML();
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/"/g, '&quot;');
+    }
+
+    // Code Generation Engine
+    function generateOutputHTML() {
+        let foldersHTML = '';
+
+        treeData.forEach(main => {
+            let subfoldersHTML = '';
+            
+            main.subfolders.forEach(sub => {
+                let quizzesHTML = '';
+                
+                sub.quizzes.forEach(quiz => {
+                    quizzesHTML += `                        <a href="${quiz.url}" class="quiz-link">${quiz.name}</a>\n`;
+                });
+
+                if (!quizzesHTML) {
+                    quizzesHTML = `                        <div class="empty-notice">No quizzes available yet</div>\n`;
+                }
+
+                subfoldersHTML += `                <details class="subfolder">
+                    <summary class="subfolder-title">${sub.name}</summary>
+                    <div class="subfolder-content">
+${quizzesHTML}                    </div>
+                </details>\n`;
+            });
+
+            foldersHTML += `     <details class="folder">
+            <summary class="folder-title">${main.name}</summary>
+            <div class="folder-content">
+${subfoldersHTML}            </div>
+        </details>\n`;
+        });
+
+        const fullDocument = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSCE 2A-1 MOCK QUIZZES</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --option-bg: #21262d;
+            --option-hover: #30363d;
+            --accent-blue: #58a6ff;
+            --border-color: #30363d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .folder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        details.folder {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+            margin-bottom: 16px;
+        }
+
+        details.folder[open] {
+            border-color: var(--accent-blue);
+        }
+
+        summary.folder-title {
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            background-color: var(--card-bg);
+            transition: background-color 0.2s;
+        }
+
+        summary.folder-title:hover {
+            background-color: var(--option-hover);
+        }
+
+        summary.folder-title::-webkit-details-marker {
+            display: none;
+        }
+
+        summary.folder-title::before {
+            content: "📁 ";
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        details[open] > summary.folder-title::before {
+            content: "📂 ";
+        }
+
+        summary.folder-title::after {
+            content: "▷";
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        details[open] > summary.folder-title::after {
+            transform: rotate(90deg);
+            color: var(--accent-blue);
+        }
+
+        .folder-content {
+            padding: 10px 20px 20px 20px;
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        details.subfolder {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        summary.subfolder-title {
+            padding: 12px 16px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        summary.subfolder-title::-webkit-details-marker {
+            display: none;
+        }
+
+        summary.subfolder-title::before {
+            content: "🗂️ ";
+            margin-right: 8px;
+        }
+
+        details[open] > summary.subfolder-title::before {
+            content: "📂 ";
+        }
+
+        summary.subfolder-title::after {
+            content: "►";
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        details[open] > summary.subfolder-title::after {
+            transform: rotate(90deg);
+        }
+
+        .subfolder-content {
+            padding: 8px 12px 12px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quiz-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            background-color: var(--option-bg);
+            color: var(--accent-blue);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .quiz-link:hover {
+            background-color: var(--option-hover);
+            border-color: var(--accent-blue);
+        }
+
+        .quiz-link::before {
+            content: "🟢 ";
+            margin-right: 10px;
+        }
+
+        .empty-notice {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding: 8px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 class="title">BSCE 2A-1 MOCK QUIZZES</h1>
+        <div class="subtitle">Select a subject folder to access quizzes</div>
+    </div>
+    <div class="folder-list">
+${foldersHTML}    </div>
+</div>
+
+</body>
+</html>`;
+
+        document.getElementById('html-output').value = fullDocument;
+    }
+
+    function copyHTML() {
+        const textarea = document.getElementById('html-output');
+        textarea.select();
+        document.execCommand('copy');
+        alert('HTML structure copied to clipboard! You can paste this directly into index.html');
+    }
+
+    // Initial render call
+    renderTree();
+</script>
+</body>
+</html>
