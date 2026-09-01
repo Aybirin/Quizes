@@ -62,7 +62,6 @@
             gap: 16px;
         }
 
-        /* Folder Styling (using native details/summary) */
         details.folder {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -93,7 +92,6 @@
             background-color: var(--option-hover);
         }
 
-        /* Hide default arrow and create custom indicator */
         summary.folder-title::-webkit-details-marker {
             display: none;
         }
@@ -126,7 +124,6 @@
             border-top: 1px solid var(--border-color);
         }
 
-        /* Nested Folder (e.g. PRELIM) */
         details.subfolder {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -151,7 +148,7 @@
         }
 
         summary.subfolder-title::before {
-            content: "🗂️";
+            content: "🗂️ ";
             margin-right: 8px;
         }
 
@@ -177,7 +174,6 @@
             gap: 8px;
         }
 
-        /* Quiz Redirect Links */
         .quiz-link {
             display: flex;
             align-items: center;
@@ -201,13 +197,6 @@
             content: "🟢";
             margin-right: 10px;
         }
-
-        .empty-notice {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            padding: 8px;
-            font-style: italic;
-        }
     </style>
 </head>
 <body>
@@ -217,29 +206,69 @@
         <h1 class="title">BSCE 2A-1 MOCK QUIZZES</h1>
         <div class="subtitle">Select a subject folder to access quizzes</div>
     </div>
-     <details class="folder">
-            <summary class="folder-title">PRELIM</summary>
-            <div class="folder-content">
-                <details class="subfolder">
-                    <summary class="subfolder-title">THEOLOGY 103</summary>
-                    <div class="subfolder-content">
-                        <a href="MQuizTheo.1.11.Complete.html" class="quiz-link">Theo.1.11</a>
-                        <a href="MQuizTheo.1.12.html" class="quiz-link">Theo1.12</a>
-                        <a href="MQuizTheo.2.11Complete.html" class="quiz-link">Theo.2.11</a>
-                        <a href="MQuizTheo.2.12.html" class="quiz-link">Theo.2.12</a>
-                    </div>
-                </details>
-                <details class="subfolder">
-                    <summary class="subfolder-title">GEC 105</summary>
-                    <div class="subfolder-content">
-                        <a href="MQuizGec105.2.Complete.html" class="quiz-link">GEC105.2</a>
-                        <a href="MQuizGec105.4.Complete.html" class="quiz-link">GEC105.4</a>
-                    </div>
-                </details>
-            </div>
-        </details>
-    </div>
+
+    <div id="folder-container" class="folder-list"></div>
 </div>
+
+<script>
+    const defaultData = [
+        {
+            name: "PRELIM",
+            subfolders: [
+                {
+                    name: "THEOLOGY 103",
+                    quizzes: [
+                        { name: "Theo.1.11", url: "MQuizTheo.1.11.Complete.html" },
+                        { name: "Theo1.12", url: "MQuizTheo.1.12.html" },
+                        { name: "Theo.2.11", url: "MQuizTheo.2.11Complete.html" },
+                        { name: "Theo.2.12", url: "MQuizTheo.2.12.html" }
+                    ]
+                },
+                {
+                    name: "GEC 105",
+                    quizzes: [
+                        { name: "GEC105.2", url: "MQuizGec105.2.Complete.html" },
+                        { name: "GEC105.4", url: "MQuizGec105.4.Complete.html" }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    const data = JSON.parse(localStorage.getItem('quiz_structure')) || defaultData;
+    const container = document.getElementById('folder-container');
+
+    data.forEach(main => {
+        const folder = document.createElement('details');
+        folder.className = 'folder';
+
+        let subHTML = '';
+        main.subfolders.forEach(sub => {
+            let quizHTML = '';
+            sub.quizzes.forEach(q => {
+                quizHTML += `<a href="${q.url}" class="quiz-link">${q.name}</a>`;
+            });
+
+            subHTML += `
+                <details class="subfolder">
+                    <summary class="subfolder-title">${sub.name}</summary>
+                    <div class="subfolder-content">
+                        ${quizHTML}
+                    </div>
+                </details>
+            `;
+        });
+
+        folder.innerHTML = `
+            <summary class="folder-title">${main.name}</summary>
+            <div class="folder-content">
+                ${subHTML}
+            </div>
+        `;
+
+        container.appendChild(folder);
+    });
+</script>
 
 </body>
 </html>
