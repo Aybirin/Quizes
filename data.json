@@ -5,17 +5,48 @@
       {
         "name": "THEOLOGY 103",
         "quizzes": [
-          { "name": "Theo.1.11", "url": "MQuizTheo.1.11.Complete.html" },
-          { "name": "Theo1.12", "url": "MQuizTheo.1.12.html" },
-          { "name": "Theo.2.11", "url": "MQuizTheo.2.11Complete.html" },
-          { "name": "Theo.2.12", "url": "MQuizTheo.2.12.html" }
+          {
+            "name": "Theology Lesson 1 Master Quiz",
+            "url": "MQuizTheo.1.1.html"
+          },
+          {
+            "name": "Theology Lesson 1 Core Quiz",
+            "url": "MQuizTheo.1.2.html"
+          },
+          {
+            "name": "Theology Lesson 2 Master Quiz",
+            "url": "MQuizTheo.2.1.html"
+          },
+          {
+            "name": "Theology Lesson 2 Core Quiz",
+            "url": "MQuizTheo.2.2.html"
+          }
         ]
       },
       {
         "name": "GEC 105",
         "quizzes": [
-          { "name": "GEC105.2", "url": "MQuizGec105.2.Complete.html" },
-          { "name": "GEC105.4", "url": "MQuizGec105.4.Complete.html" }
+          {
+            "name": "GEC 105 Week 2",
+            "url": "MQuizGec105.2.Complete.html"
+          },
+          {
+            "name": "GEC 105 Week 4",
+            "url": "MQuizGec105.4.Complete.html"
+          }
+        ]
+      },
+      {
+        "name": "ESMAN",
+        "quizzes": [
+          {
+            "name": "ESMAN 2",
+            "url": "MQuizEsman.2.html"
+          },
+          {
+            "name": "ESMAN 3",
+            "url": "MQuizEsman.3.html"
+          }
         ]
       }
     ]
