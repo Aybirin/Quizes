@@ -328,7 +328,7 @@
     function addSubFolder(mIdx) { structure[mIdx].subfolders.push({ name: "NEW SUBFOLDER", quizzes: [] }); renderEditor(); }
     function addQuiz(mIdx, sIdx) { structure[mIdx].subfolders[sIdx].quizzes.push({ name: "New Quiz", url: "quiz.html" }); renderEditor(); }
     function removeMain(mIdx) { structure.splice(mIdx, 1); renderEditor(); }
-    function removeSub(mIdx, sIdx) { structure[mIdx].subfolders[sIdx].splice(sIdx, 1); renderEditor(); }
+    function removeSub(mIdx, sIdx) { structure[mIdx].subfolders.splice(sIdx, 1); renderEditor(); }
     function removeQuiz(mIdx, sIdx, qIdx) { structure[mIdx].subfolders[sIdx].quizzes.splice(qIdx, 1); renderEditor(); }
 
     async function commitToGitHub() {
